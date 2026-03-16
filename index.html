@@ -354,6 +354,11 @@
         <li>If your weapon is a <strong>crossbow</strong>, you may give yourself <strong>999 basic Bolts</strong>.</li>
         <li>If your weapon is a <strong>flame, catalyst, or talisman</strong>, you may start with one damaging spell whose stat requirement is <strong>≤ 30</strong>.</li>
       </ul>
+      <h3>Shield (if enabled)</h3>
+      <ul>
+        <li><strong>Random Shield:</strong> You may only use the rolled shield. No other shields may be equipped.</li>
+        <li><strong>No Shield:</strong> You may not equip any shield for the entire run.</li>
+      </ul>
       <h3>Armor (if enabled)</h3>
       <ul>
         <li>You may not equip any other armor found in-game.</li>
@@ -398,6 +403,31 @@
     </div>
   </div>
 
+  <!-- Shield -->
+  <div class="panel">
+    <div class="panel-title">Shield</div>
+    <div class="radio-group">
+      <label class="radio-label">
+        <input type="radio" name="shield" value="random">
+        <span>Random Shield
+          <span class="sublabel">A shield is randomly selected — you may only use this one.</span>
+        </span>
+      </label>
+      <label class="radio-label">
+        <input type="radio" name="shield" value="none">
+        <span>No Shield
+          <span class="sublabel">You may not equip any shield for the entire run.</span>
+        </span>
+      </label>
+      <label class="radio-label">
+        <input type="radio" name="shield" value="free" checked>
+        <span>No Restrictions
+          <span class="sublabel">Equip any shield freely.</span>
+        </span>
+      </label>
+    </div>
+  </div>
+
   <!-- Armor -->
   <div class="panel">
     <div class="panel-title">Armor</div>
@@ -437,6 +467,14 @@
       <div id="res-category"></div>
       <div class="res-meta" id="res-upgrade"></div>
       <div id="res-notes"></div>
+    </div>
+
+    <hr class="divider" id="shield-divider" style="display:none">
+
+    <div class="result-row" id="shield-row" style="display:none">
+      <div class="res-label">Shield</div>
+      <div class="res-name" id="res-shield">—</div>
+      <div id="res-shield-notes"></div>
     </div>
 
     <hr class="divider" id="armor-divider" style="display:none">
@@ -596,6 +634,20 @@
     ]
   };
 
+  const SHIELDS = [
+    "Small Leather Shield", "Leather Shield", "Target Shield", "Buckler",
+    "Cracked Round Shield", "Warrior's Round Shield", "Red & White Round Shield",
+    "Caduceus Round Shield", "Effigy Shield", "Plank Shield", "Crystal Ring Shield",
+    "Gargoyle's Shield", "East-West Shield", "Wooden Shield", "Large Leather Shield",
+    "Heater Shield", "Knight Shield", "Tower Kite Shield", "Caduceus Kite Shield",
+    "Hollow Soldier Shield", "Balder Shield", "Sunlight Shield", "Iron Round Shield",
+    "Silver Knight Shield", "Black Knight Shield", "Pierce Shield", "Spiked Shield",
+    "Crest Shield", "Dragon Crest Shield", "Grass Crest Shield", "Spider Shield",
+    "Bloodshield", "Sanctus", "Crystal Shield", "Bonewheel Shield",
+    "Tower Shield", "Stone Greatshield", "Eagle Shield", "Black Iron Greatshield",
+    "Havel's Greatshield", "Greatshield of Artorias", "Giant Shield", "Cleansing Greatshield"
+  ];
+
   const ARMOR_SETS = [
     "Adventurer's Set", "Antiquated Set", "Artorias' Set", "Balder Set",
     "Bandit Set", "Big Hat's Set", "Black Iron Set", "Black Knight Set",
@@ -680,6 +732,28 @@
 
     if (cat === 'flame' || cat === 'catalyst' || cat === 'talisman') {
       notesEl.innerHTML += `<div class="note-box">You may start with <strong>one damaging spell</strong> whose stat requirement is <strong>≤ 30</strong>.</div>`;
+    }
+
+    // Shield
+    const shieldMode    = document.querySelector('input[name="shield"]:checked').value;
+    const shieldRow     = document.getElementById('shield-row');
+    const shieldDivider = document.getElementById('shield-divider');
+    const shieldNotesEl = document.getElementById('res-shield-notes');
+    shieldNotesEl.innerHTML = '';
+
+    if (shieldMode === 'random') {
+      document.getElementById('res-shield').textContent = pick(SHIELDS);
+      shieldNotesEl.innerHTML = '<div class="note-box">You may only use this shield. You may not equip any other shield found in-game.</div>';
+      shieldRow.style.display = 'block';
+      shieldDivider.style.display = 'block';
+    } else if (shieldMode === 'none') {
+      document.getElementById('res-shield').textContent = 'No Shield';
+      shieldNotesEl.innerHTML = '<div class="note-box">You may not equip any shield for the entire run.</div>';
+      shieldRow.style.display = 'block';
+      shieldDivider.style.display = 'block';
+    } else {
+      shieldRow.style.display = 'none';
+      shieldDivider.style.display = 'none';
     }
 
     // Armor
