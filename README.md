@@ -1,4 +1,4 @@
-# Ashbound Oath — Dark Souls 1 Challenge Run Generator
+# Ashbound Oath — DS1 Challenge Run Generator
 
 A simple browser-based randomizer for the Ashbound Oath challenge run format.
 
@@ -11,9 +11,9 @@ A simple browser-based randomizer for the Ashbound Oath challenge run format.
 ## The Challenge
 
 - **NG+1** — start a New Game Plus run
-- **No Estus Flask** — remove it after the Undead Asylum
+- **No Flask** — remove it immediately after the tutorial
 - Roll a **random starting weapon** — you may not equip any other weapon in your right hand for the entire run
-- Defeat every boss with a victory screen **before Ornstein & Smough**, then defeat O&S
+- Defeat every boss with a victory screen **before O&S**, then defeat O&S
 - No quit-out cheese, no glitches, no sequence breaking
 
 Full rules are listed in the generator itself.
