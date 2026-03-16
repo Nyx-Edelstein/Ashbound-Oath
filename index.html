@@ -369,6 +369,14 @@
         <input type="checkbox" id="pool-talisman">
         Talismans
       </label>
+      <label class="check-label">
+        <input type="checkbox" id="pool-bow">
+        Bows
+      </label>
+      <label class="check-label">
+        <input type="checkbox" id="pool-crossbow">
+        Crossbows
+      </label>
     </div>
   </div>
 
@@ -463,14 +471,11 @@
       "Titanite Catch Pole",
       "Black Knight Halberd",
       "Lifehunt Scythe & Bloodshield",
-      "Darkmoon Bow",
-      "Dragonslayer Greatbow",
       "Dark Silver Tracer",
       "Abyss Greatsword",
       "Obsidian Greatsword",
       "Gold Tracer",
-      "Stone Greataxe",
-      "Gough's Greatbow"
+      "Stone Greataxe"
     ],
     normal: [
       "Cestus",
@@ -530,16 +535,23 @@
       "Great Scythe",
       "Whip",
       "Notched Whip",
+      "Four-Pronged Plow",
+      "Guardian Tail"
+    ],
+    bow: [
       "Short Bow",
       "Composite Bow",
       "Longbow",
       "Black Bow of Pharis",
+      "Darkmoon Bow",
+      "Dragonslayer Greatbow",
+      "Gough's Greatbow"
+    ],
+    crossbow: [
       "Light Crossbow",
       "Heavy Crossbow",
       "Sniper Crossbow",
-      "Avelyn",
-      "Four-Pronged Plow",
-      "Guardian Tail"
+      "Avelyn"
     ],
     flame: [
       "Pyromancy Flame +15"
@@ -584,16 +596,14 @@
     "Warrior Set", "Witch Set", "Xanthous Set"
   ];
 
-  const BOWS      = new Set(["Short Bow", "Composite Bow", "Longbow", "Black Bow of Pharis",
-                              "Darkmoon Bow", "Dragonslayer Greatbow", "Gough's Greatbow"]);
-  const CROSSBOWS = new Set(["Light Crossbow", "Heavy Crossbow", "Sniper Crossbow", "Avelyn"]);
-
   const CAT_LABELS = {
     unique:   "Unique / Boss",
     normal:   "Normal",
     flame:    "Pyromancy Flame",
     catalyst: "Catalyst",
-    talisman: "Talisman"
+    talisman: "Talisman",
+    bow:      "Bow",
+    crossbow: "Crossbow"
   };
 
   function pick(arr) {
@@ -610,6 +620,8 @@
     if (document.getElementById('pool-flame').checked)    WEAPONS.flame.forEach(w     => pool.push({ w, cat: 'flame' }));
     if (document.getElementById('pool-catalyst').checked) WEAPONS.catalyst.forEach(w  => pool.push({ w, cat: 'catalyst' }));
     if (document.getElementById('pool-talisman').checked) WEAPONS.talisman.forEach(w  => pool.push({ w, cat: 'talisman' }));
+    if (document.getElementById('pool-bow').checked)      WEAPONS.bow.forEach(w       => pool.push({ w, cat: 'bow' }));
+    if (document.getElementById('pool-crossbow').checked) WEAPONS.crossbow.forEach(w  => pool.push({ w, cat: 'crossbow' }));
 
     if (pool.length === 0) {
       warn.style.display = 'block';
@@ -629,19 +641,22 @@
 
     // Upgrade level
     let upgradeText = '';
-    if (cat === 'unique')        upgradeText = 'No upgrades';
-    else if (cat === 'normal')   upgradeText = 'Start at +5 or +10 — your discretion';
-    else if (cat === 'flame')    upgradeText = 'Start at +15';
-    else                         upgradeText = 'No upgrade path';
+    if (cat === 'unique')                       upgradeText = 'No upgrades';
+    else if (cat === 'normal')                  upgradeText = 'Start at +5 or +10 — your discretion';
+    else if (cat === 'flame')                   upgradeText = 'Start at +15';
+    else if (cat === 'bow' || cat === 'crossbow') {
+      const isUniqueBow = ["Darkmoon Bow", "Dragonslayer Greatbow", "Gough's Greatbow"].includes(weapon);
+      upgradeText = isUniqueBow ? 'No upgrades' : 'Start at +5 or +10 — your discretion';
+    } else                                      upgradeText = 'No upgrade path';
     document.getElementById('res-upgrade').textContent = upgradeText;
 
     // Special notes
     const notesEl = document.getElementById('res-notes');
     notesEl.innerHTML = '';
 
-    if (BOWS.has(weapon)) {
+    if (cat === 'bow') {
       notesEl.innerHTML += `<div class="note-box">You may give yourself <strong>999 Arrows</strong>.</div>`;
-    } else if (CROSSBOWS.has(weapon)) {
+    } else if (cat === 'crossbow') {
       notesEl.innerHTML += `<div class="note-box">You may give yourself <strong>999 Bolts</strong>.</div>`;
     }
 
