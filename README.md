@@ -2,7 +2,7 @@
 
 A simple browser-based randomizer for the Ashbound Oath challenge run format.
 
-**[Open the generator →](https://your-username.github.io/your-repo-name/)**
+**[Open the generator →](https://nyx-edelstein.github.io/Ashbound-Oath/)**
 
 ---
 
