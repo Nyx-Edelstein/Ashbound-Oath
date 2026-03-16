@@ -465,7 +465,7 @@
       <div class="res-label">Starting Weapon</div>
       <div class="res-name" id="res-weapon">—</div>
       <div id="res-category"></div>
-      <div class="res-meta" id="res-upgrade"></div>
+      <div id="res-upgrade"></div>
       <div id="res-notes"></div>
     </div>
 
@@ -718,7 +718,7 @@
       const isUniqueBow = ["Darkmoon Bow", "Dragonslayer Greatbow", "Gough's Greatbow"].includes(weapon);
       upgradeText = isUniqueBow ? 'No upgrades' : 'Start at +5 or +10 — your discretion';
     } else                                      upgradeText = 'No upgrade path';
-    document.getElementById('res-upgrade').textContent = upgradeText;
+    document.getElementById('res-upgrade').innerHTML = `<div class="note-box">${upgradeText}</div>`;
 
     // Special notes
     const notesEl = document.getElementById('res-notes');
