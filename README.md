@@ -6,15 +6,12 @@ A simple browser-based randomizer for the Ashbound Oath challenge run format.
 
 **[MugenMonkey Character Planner](https://www.mugenmonkey.com/darksouls/)**
 
-**[DSR Save Editor](https://www.nexusmods.com/darksoulsremastered/mods/1113)**
-
 ---
 
 ## The Challenge
 
 - **NG+1** — start a New Game Plus run
-- **No Estus Flask** — remove it via save editor after the Undead Asylum
-- **Play offline** — required to avoid ban risk when using a save editor
+- **No Estus Flask** — remove it after the Undead Asylum
 - Roll a **random starting weapon** — you may not equip any other weapon in your right hand for the entire run
 - Defeat every boss with a victory screen **before Ornstein & Smough**, then defeat O&S
 - No quit-out cheese, no glitches, no sequence breaking
