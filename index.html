@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ashbound Oath — Dark Souls 1 Challenge Run Generator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0e0d0b;
+      color: #c9b99a;
+      font-family: 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+      min-height: 100vh;
+      padding: 2.5rem 1rem 5rem;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #3a2f1e;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #e8c870;
+      letter-spacing: 0.06em;
+      text-shadow: 0 0 24px #c8920028;
+    }
+
+    h1 .subtitle {
+      display: block;
+      font-size: 0.82rem;
+      color: #7a6a50;
+      margin-top: 0.35rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    /* ── Panels ── */
+    .panel {
+      background: #161309;
+      border: 1px solid #302618;
+      border-radius: 3px;
+      padding: 1.4rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .panel-title {
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #8a7860;
+      margin-bottom: 1rem;
+      padding-bottom: 0.55rem;
+      border-bottom: 1px solid #251e12;
+    }
+
+    /* ── Checkboxes ── */
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 0.35rem;
+    }
+
+    label.check-label {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      cursor: pointer;
+      padding: 0.45rem 0.6rem;
+      border-radius: 3px;
+      transition: background 0.12s;
+      user-select: none;
+    }
+
+    label.check-label:hover { background: #201a0e; }
+
+    input[type="checkbox"],
+    input[type="radio"] {
+      accent-color: #c8900a;
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    /* ── Radio buttons ── */
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    label.radio-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.7rem;
+      cursor: pointer;
+      padding: 0.5rem 0.6rem;
+      border-radius: 3px;
+      transition: background 0.12s;
+      user-select: none;
+    }
+
+    label.radio-label:hover { background: #201a0e; }
+
+    label.radio-label input { margin-top: 0.15rem; }
+
+    .sublabel {
+      display: block;
+      font-size: 0.8rem;
+      color: #6a5a40;
+      margin-top: 0.1rem;
+    }
+
+    /* ── Warning ── */
+    #warn-empty {
+      display: none;
+      color: #d06050;
+      font-size: 0.88rem;
+      padding: 0.65rem 1rem;
+      background: #1c0e0e;
+      border: 1px solid #5a2424;
+      border-radius: 3px;
+      margin-bottom: 1rem;
+    }
+
+    /* ── Generate button ── */
+    .btn-generate {
+      display: block;
+      width: 100%;
+      padding: 0.95rem 1rem;
+      background: #1e1810;
+      border: 1px solid #b08020;
+      color: #e8c870;
+      font-family: inherit;
+      font-size: 1rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 3px;
+      margin-bottom: 1.4rem;
+      transition: background 0.18s, box-shadow 0.18s, border-color 0.18s;
+    }
+
+    .btn-generate:hover {
+      background: #2c2214;
+      border-color: #e8c870;
+      box-shadow: 0 0 14px #c8920022;
+    }
+
+    .btn-generate:active { background: #14100a; }
+
+    /* ── Result panel ── */
+    #result {
+      display: none;
+      animation: fadeSlideIn 0.3s ease both;
+    }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-row {
+      margin-bottom: 1.2rem;
+    }
+
+    .result-row:last-child { margin-bottom: 0; }
+
+    .res-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #6a5a40;
+      margin-bottom: 0.25rem;
+    }
+
+    .res-name {
+      font-size: 1.45rem;
+      color: #e8c870;
+      line-height: 1.2;
+    }
+
+    .res-meta {
+      font-size: 0.85rem;
+      color: #8a7a60;
+      margin-top: 0.2rem;
+    }
+
+    .category-tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #b09060;
+      border: 1px solid #3a2e18;
+      border-radius: 2px;
+      padding: 0.1rem 0.45rem;
+      margin-top: 0.3rem;
+    }
+
+    .note-box {
+      background: #1c1509;
+      border-left: 3px solid #a07820;
+      padding: 0.65rem 1rem;
+      margin-top: 0.6rem;
+      border-radius: 0 3px 3px 0;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: #b0a080;
+    }
+
+    .note-box + .note-box { margin-top: 0.35rem; }
+
+    .note-box strong { color: #d4b060; }
+
+    hr.divider {
+      border: none;
+      border-top: 1px solid #251e12;
+      margin: 1.25rem 0;
+    }
+
+    /* ── Rules reference ── */
+    details.rules {
+      background: #131108;
+      border: 1px solid #282010;
+      border-radius: 3px;
+      margin-top: 1.4rem;
+    }
+
+    details.rules summary {
+      padding: 0.85rem 1.2rem;
+      cursor: pointer;
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #6a5a40;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      user-select: none;
+    }
+
+    details.rules summary::-webkit-details-marker { display: none; }
+
+    details.rules summary::before {
+      content: '▶';
+      font-size: 0.6rem;
+      transition: transform 0.15s;
+    }
+
+    details[open].rules summary::before { transform: rotate(90deg); }
+
+    .rules-body {
+      padding: 0 1.3rem 1.3rem;
+      font-size: 0.87rem;
+      line-height: 1.75;
+      color: #9a8a70;
+    }
+
+    .rules-body h3 {
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #b09060;
+      margin: 1rem 0 0.5rem;
+    }
+
+    .rules-body ul {
+      list-style: none;
+      padding-left: 0.2rem;
+    }
+
+    .rules-body ul li {
+      padding-left: 1.1rem;
+      text-indent: -1.1rem;
+    }
+
+    .rules-body ul li::before {
+      content: '— ';
+      color: #4a3a20;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      h1 { font-size: 1.5rem; }
+      .checkbox-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>Ashbound Oath
+      <span class="subtitle">Dark Souls 1 — Challenge Run Generator</span>
+    </h1>
+  </header>
+
+  <!-- Rules Reference -->
+  <details class="rules" open>
+    <summary>Rules Reference</summary>
+    <div class="rules-body">
+      <h3>Setup</h3>
+      <ul>
+        <li>Play in <strong>offline mode</strong> — you will need a save editor. Avoid ban risk.</li>
+        <li>New Game+ (NG+1).</li>
+        <li>Use a save editor to <strong>remove your Estus Flask</strong> after the Undead Asylum. You do not have one.</li>
+        <li>Start at Firelink Shrine with an empty inventory except for your starting gift, class items, and your rolled starting weapon (and armor, if applicable).</li>
+      </ul>
+      <h3>Goal</h3>
+      <ul>
+        <li>Defeat every boss with a victory screen <strong>before</strong> Ornstein &amp; Smough, then defeat O&amp;S.</li>
+        <li>Four Kings is optional.</li>
+        <li>No quit-out cheese. No glitches. No sequence breaking.</li>
+      </ul>
+      <h3>Weapon</h3>
+      <ul>
+        <li>You may not equip any other weapon in your <strong>right hand</strong> for the entire run.</li>
+        <li>Choose your class and give yourself the minimum stat points needed to <strong>two-hand</strong> your weapon.</li>
+        <li>Normal weapons start at <strong>+5 or +10</strong> — your discretion. Note: Some upgrade paths require +5 to start.</li>
+        <li>Unique / Boss weapons are <strong>not upgraded</strong>.</li>
+        <li>The Pyromancy Flame starts at <strong>+15</strong>.</li>
+        <li>You may freely use <strong>left-hand</strong> weapons found in-game.</li>
+        <li>If your weapon is a <strong>bow</strong>, you may give yourself <strong>999 basic Arrows</strong>.</li>
+        <li>If your weapon is a <strong>crossbow</strong>, you may give yourself <strong>999 basic Bolts</strong>.</li>
+        <li>If your weapon is a <strong>flame, catalyst, or talisman</strong>, you may start with one damaging spell whose stat requirement is <strong>≤ 20</strong>.</li>
+      </ul>
+      <h3>Armor (if enabled)</h3>
+      <ul>
+        <li>You may not equip any other armor found in-game.</li>
+        <li>The <strong>helm</strong> may be unequipped, or swapped for special items once obtained in-game (Sunlight Maggot, Dusk Crown, Masks, etc).</li>
+        <li>You may give yourself the minimum <strong>Endurance</strong> to stay under 100% equip load (avoid over-encumbrance).</li>
+      </ul>
+    </div>
+  </details>
+
+  <!-- Weapon Pool -->
+  <div class="panel">
+    <div class="panel-title">Weapon Pool</div>
+    <div class="checkbox-grid">
+      <label class="check-label">
+        <input type="checkbox" id="pool-unique" checked>
+        Unique / Boss
+      </label>
+      <label class="check-label">
+        <input type="checkbox" id="pool-normal" checked>
+        Normal
+      </label>
+      <label class="check-label">
+        <input type="checkbox" id="pool-flame">
+        Pyromancy Flame
+      </label>
+      <label class="check-label">
+        <input type="checkbox" id="pool-catalyst">
+        Catalysts
+      </label>
+      <label class="check-label">
+        <input type="checkbox" id="pool-talisman">
+        Talismans
+      </label>
+    </div>
+  </div>
+
+  <!-- Armor -->
+  <div class="panel">
+    <div class="panel-title">Armor</div>
+    <div class="radio-group">
+      <label class="radio-label">
+        <input type="radio" name="armor" value="random">
+        <span>Random Armor Set
+          <span class="sublabel">A set is randomly selected — you may not swap it out.</span>
+        </span>
+      </label>
+      <label class="radio-label">
+        <input type="radio" name="armor" value="choice">
+        <span>Choose Your Own
+          <span class="sublabel">Pick any set; same restrictions apply.</span>
+        </span>
+      </label>
+      <label class="radio-label">
+        <input type="radio" name="armor" value="none" checked>
+        <span>None
+          <span class="sublabel">No armor restriction — equip freely.</span>
+        </span>
+      </label>
+    </div>
+  </div>
+
+  <div id="warn-empty">Select at least one weapon category to roll.</div>
+
+  <button class="btn-generate" onclick="generate()">Roll Challenge Run</button>
+
+  <!-- Result -->
+  <div class="panel" id="result">
+    <div class="panel-title">Your Run</div>
+
+    <div class="result-row">
+      <div class="res-label">Starting Weapon</div>
+      <div class="res-name" id="res-weapon">—</div>
+      <div id="res-category"></div>
+      <div class="res-meta" id="res-upgrade"></div>
+      <div id="res-notes"></div>
+    </div>
+
+    <hr class="divider" id="armor-divider" style="display:none">
+
+    <div class="result-row" id="armor-row" style="display:none">
+      <div class="res-label">Armor Set</div>
+      <div class="res-name" id="res-armor">—</div>
+      <div id="res-armor-notes"></div>
+    </div>
+  </div>
+
+
+</div><!-- /.container -->
+
+<script>
+  const WEAPONS = {
+    unique: [
+      "Dragon Bone Fist",
+      "Priscilla's Dagger",
+      "Silver Knight Str. Swd.",
+      "Astora's Str. Sword",
+      "Drake Sword",
+      "Black Knight Sword",
+      "Stone Greatsword",
+      "Cursed Greatsword of Artorias",
+      "Greatsword of Artorias",
+      "Great Lord Greatsword",
+      "Moonlight Greatsword",
+      "Black Knight Greatsword",
+      "Dragon Greatsword",
+      "Jagged Ghost Blade",
+      "Quelaag's Furysword",
+      "Gravelord Sword",
+      "Velka's Rapier",
+      "Crescent Axe",
+      "Golem Axe",
+      "Black Knight Greataxe",
+      "Dragon King Greataxe",
+      "Blacksmith Giant Hammer",
+      "Hammer of Vamos",
+      "Grant",
+      "Dragon Tooth",
+      "Smough's Hammer",
+      "Channeler's Trident",
+      "Demon's Spear",
+      "Silver Knight Spear",
+      "Moonlight Butterfly Horn",
+      "Dragonslayer Spear",
+      "Giant's Halberd",
+      "Titanite Catch Pole",
+      "Black Knight Halberd",
+      "Lifehunt Scythe & Bloodshield",
+      "Darkmoon Bow",
+      "Dragonslayer Greatbow",
+      "Dark Silver Tracer",
+      "Abyss Greatsword",
+      "Obsidian Greatsword",
+      "Gold Tracer",
+      "Stone Greataxe",
+      "Gough's Greatbow"
+    ],
+    normal: [
+      "Cestus",
+      "Claw",
+      "Dagger",
+      "Bandit's Knife",
+      "Shortsword",
+      "Longsword",
+      "Broadsword",
+      "Balder Side Sword",
+      "Sunlight Straight Sword",
+      "Barbed Straight Sword",
+      "Darksword",
+      "Bastard Sword",
+      "Claymore",
+      "Man-Serpent Greatsword",
+      "Flamberge",
+      "Zweihander",
+      "Greatsword",
+      "Demon Great Machete",
+      "Scimitar",
+      "Falchion",
+      "Shotel",
+      "Painting Guardian Sword",
+      "Uchigatana",
+      "Washing Pole",
+      "Iaito",
+      "Server",
+      "Murakumo",
+      "Rapier",
+      "Estoc",
+      "Ricard's Rapier",
+      "Hand Axe",
+      "Battle Axe",
+      "Butcher Knife",
+      "Gargoyle Tail Axe",
+      "Greataxe",
+      "Demon's Greataxe",
+      "Club",
+      "Mace",
+      "Morning Star",
+      "War Pick",
+      "Pickaxe",
+      "Reinforced Club",
+      "Blacksmith Hammer",
+      "Great Club",
+      "Demon's Great Hammer",
+      "Large Club",
+      "Spear",
+      "Winged Spear",
+      "Partizan",
+      "Pike",
+      "Halberd",
+      "Gargoyle's Halberd",
+      "Lucerne",
+      "Scythe",
+      "Great Scythe",
+      "Whip",
+      "Notched Whip",
+      "Short Bow",
+      "Composite Bow",
+      "Longbow",
+      "Black Bow of Pharis",
+      "Light Crossbow",
+      "Heavy Crossbow",
+      "Sniper Crossbow",
+      "Avelyn",
+      "Four-Pronged Plow",
+      "Guardian Tail"
+    ],
+    flame: [
+      "Pyromancy Flame +15"
+    ],
+    catalyst: [
+      "Sorcerer's Catalyst",
+      "Beatrice's Catalyst",
+      "Logan's Catalyst",
+      "Oolacile Ivory Catalyst",
+      "Demon's Catalyst",
+      "Izalith Catalyst",
+      "Tin Banishment Catalyst",
+      "Tin Crystallization Catalyst",
+      "Tin Darkmoon Catalyst",
+      "Oolacile Catalyst",
+      "Manus Catalyst"
+    ],
+    talisman: [
+      "Canvas Talisman",
+      "Ivory Talisman",
+      "Sunlight Talisman",
+      "Darkmoon Talisman",
+      "Velka's Talisman"
+    ]
+  };
+
+  const ARMOR_SETS = [
+    "Adventurer's Set", "Antiquated Set", "Artorias' Set", "Balder Set",
+    "Bandit Set", "Big Hat's Set", "Black Iron Set", "Black Knight Set",
+    "Black Set", "Black Sorcerer Set", "Brass Set", "Catarina Set",
+    "Chain Set", "Channeler Set", "Chester's Set", "Cleric Set",
+    "Crimson Set", "Crystalline Set", "Dark Set", "Dingy Set",
+    "Eastern Set", "Elite Knight Set", "Favor Set", "Giant Armor Set",
+    "Gold-Hemmed Black Set", "Gough's Set", "Great Lord Set",
+    "Guardian Set", "Gwyndolin Moonlight Set", "Havel's Set",
+    "Hollow Soldier Set", "Hollow Thief Set", "Hollow Warrior Set",
+    "Holy Set", "Hunter Set", "Iron Golem Set", "Iron Set",
+    "Knight Set", "Lord's Blade Set", "Maiden Set", "Ornstein's Set",
+    "Painting Guardian Set", "Paladin Set", "Pyromancer Set", "Thorns Set",
+    "Shadow Set", "Silver Knight Set", "Smough's Set", "Sorcerer Set",
+    "Steel Set", "Stone Knight Set", "Thief Set", "Wanderer Set",
+    "Warrior Set", "Witch Set", "Xanthous Set"
+  ];
+
+  const BOWS      = new Set(["Short Bow", "Composite Bow", "Longbow", "Black Bow of Pharis",
+                              "Darkmoon Bow", "Dragonslayer Greatbow", "Gough's Greatbow"]);
+  const CROSSBOWS = new Set(["Light Crossbow", "Heavy Crossbow", "Sniper Crossbow", "Avelyn"]);
+
+  const CAT_LABELS = {
+    unique:   "Unique / Boss",
+    normal:   "Normal",
+    flame:    "Pyromancy Flame",
+    catalyst: "Catalyst",
+    talisman: "Talisman"
+  };
+
+  function pick(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function generate() {
+    const warn = document.getElementById('warn-empty');
+
+    // Build weighted pool
+    const pool = [];
+    if (document.getElementById('pool-unique').checked)   WEAPONS.unique.forEach(w    => pool.push({ w, cat: 'unique' }));
+    if (document.getElementById('pool-normal').checked)   WEAPONS.normal.forEach(w    => pool.push({ w, cat: 'normal' }));
+    if (document.getElementById('pool-flame').checked)    WEAPONS.flame.forEach(w     => pool.push({ w, cat: 'flame' }));
+    if (document.getElementById('pool-catalyst').checked) WEAPONS.catalyst.forEach(w  => pool.push({ w, cat: 'catalyst' }));
+    if (document.getElementById('pool-talisman').checked) WEAPONS.talisman.forEach(w  => pool.push({ w, cat: 'talisman' }));
+
+    if (pool.length === 0) {
+      warn.style.display = 'block';
+      document.getElementById('result').style.display = 'none';
+      return;
+    }
+    warn.style.display = 'none';
+
+    const { w: weapon, cat } = pick(pool);
+
+    // Weapon name
+    document.getElementById('res-weapon').textContent = weapon;
+
+    // Category tag
+    document.getElementById('res-category').innerHTML =
+      `<span class="category-tag">${CAT_LABELS[cat]}</span>`;
+
+    // Upgrade level
+    let upgradeText = '';
+    if (cat === 'unique')        upgradeText = 'No upgrades';
+    else if (cat === 'normal')   upgradeText = 'Start at +5 or +10 — your discretion';
+    else if (cat === 'flame')    upgradeText = 'Start at +15';
+    else                         upgradeText = 'No upgrade path';
+    document.getElementById('res-upgrade').textContent = upgradeText;
+
+    // Special notes
+    const notesEl = document.getElementById('res-notes');
+    notesEl.innerHTML = '';
+
+    if (BOWS.has(weapon)) {
+      notesEl.innerHTML += `<div class="note-box">You may give yourself <strong>999 Arrows</strong>.</div>`;
+    } else if (CROSSBOWS.has(weapon)) {
+      notesEl.innerHTML += `<div class="note-box">You may give yourself <strong>999 Bolts</strong>.</div>`;
+    }
+
+    if (cat === 'flame' || cat === 'catalyst' || cat === 'talisman') {
+      notesEl.innerHTML += `<div class="note-box">You may start with <strong>one damaging spell</strong> whose stat requirement is <strong>≤ 20</strong>.</div>`;
+    }
+
+    // Armor
+    const armorMode     = document.querySelector('input[name="armor"]:checked').value;
+    const armorRow      = document.getElementById('armor-row');
+    const armorDivider  = document.getElementById('armor-divider');
+    const armorNotesEl  = document.getElementById('res-armor-notes');
+    armorNotesEl.innerHTML = '';
+
+    const sharedArmorNote = `<div class="note-box">
+      You may not equip any other armor found in-game.<br>
+      The <strong>helm</strong> may be unequipped, or swapped for special items once obtained in-game (Sunlight Maggot, Dusk Crown, Masks, etc).<br>
+      You may grant yourself the minimum <strong>Endurance</strong> to stay under 100% equip load.
+    </div>`;
+
+    if (armorMode === 'random') {
+      document.getElementById('res-armor').textContent = pick(ARMOR_SETS);
+      armorNotesEl.innerHTML = sharedArmorNote;
+      armorRow.style.display = 'block';
+      armorDivider.style.display = 'block';
+    } else if (armorMode === 'choice') {
+      document.getElementById('res-armor').textContent = 'Your choice';
+      armorNotesEl.innerHTML = sharedArmorNote;
+      armorRow.style.display = 'block';
+      armorDivider.style.display = 'block';
+    } else {
+      armorRow.style.display = 'none';
+      armorDivider.style.display = 'none';
+    }
+
+    // Show result with fresh animation
+    const resultEl = document.getElementById('result');
+    resultEl.style.display = 'none';
+    // Force reflow so the animation re-triggers
+    void resultEl.offsetHeight;
+    resultEl.style.display = 'block';
+  }
+</script>
+</body>
+</html>
