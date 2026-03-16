@@ -4,6 +4,10 @@ A simple browser-based randomizer for the Ashbound Oath challenge run format.
 
 **[Open the generator →](https://nyx-edelstein.github.io/Ashbound-Oath/)**
 
+**[MugenMonkey Character Planner](https://www.mugenmonkey.com/darksouls/)**
+
+**[DSR Save Editor](https://www.nexusmods.com/darksoulsremastered/mods/1113)**
+
 ---
 
 ## The Challenge
