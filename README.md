@@ -24,3 +24,7 @@ Open `index.html` in any browser, or visit the GitHub Pages link above.
 1. Select which weapon categories to include in the pool
 2. Choose your armor option (random, choice, or none)
 3. Click **Roll Challenge Run**
+
+## Notice
+
+This project was generated with an AI code assistant.
