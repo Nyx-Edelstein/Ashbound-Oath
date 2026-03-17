@@ -421,7 +421,7 @@
   <br>
 
   <!-- Weapon Pool -->
-  <div class="panel">
+  <div class="panel" id="panel-weapon-pool">
     <div class="panel-title">Weapon Pool</div>
     <div class="checkbox-grid">
       <label class="check-label">
@@ -456,7 +456,7 @@
   </div>
 
   <!-- Shield -->
-  <div class="panel">
+  <div class="panel" id="panel-shield">
     <div class="panel-title">Shield</div>
     <div class="radio-group">
       <label class="radio-label">
@@ -481,7 +481,7 @@
   </div>
 
   <!-- Armor -->
-  <div class="panel">
+  <div class="panel" id="panel-armor">
     <div class="panel-title">Armor</div>
     <div class="radio-group">
       <label class="radio-label">
@@ -977,10 +977,17 @@
     rerollsLeft.armor = 2;
     ['weapon', 'secondary', 'shield', 'armor'].forEach(c => updateRerollButton('reroll-' + c, c));
 
-    // Disable the generate button
+    // Hide option panels and button
+    document.getElementById('panel-weapon-pool').style.display = 'none';
+    document.getElementById('panel-shield').style.display = 'none';
+    document.getElementById('panel-armor').style.display = 'none';
+    document.getElementById('warn-empty').style.display = 'none';
+    // Disable and restyle the generate button
+    const sealEmojis = ['⚔️', '🔥', '⛓️', '💀', '🗡️', '☠️'];
+    const sealEmoji = pick(sealEmojis);
     const btn = document.getElementById('btn-generate');
     btn.disabled = true;
-    btn.textContent = 'Oath Sealed';
+    btn.textContent = `${sealEmoji} Oath Sealed ${sealEmoji}`;
 
     // Show result with fresh animation
     const resultEl = document.getElementById('result');
