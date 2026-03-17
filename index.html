@@ -383,6 +383,12 @@
       letter-spacing: 0.08em;
     }
 
+    .skull-breakdown {
+      font-size: 0.75rem;
+      color: #6a5a40;
+      margin-bottom: 0.5rem;
+    }
+
     .skull-taunt {
       font-size: 0.82rem;
       color: #6a5a40;
@@ -424,7 +430,7 @@
 
     .modifier-skulls {
       font-size: 0.75rem;
-      color: #6a5a40;
+      color: #cbc8c2;
       margin-left: 0.3rem;
     }
 
@@ -649,33 +655,6 @@
 
   <div id="warn-empty">Select at least one weapon category to roll.</div>
 
-  <!-- Challenge Modifiers -->
-  <div class="panel" id="panel-modifiers">
-    <div class="panel-title">Challenge Modifiers</div>
-    <div class="modifier-grid">
-      <label class="check-label">
-        <input type="checkbox" id="mod-no-leveling">
-        No Leveling <span class="modifier-skulls">+5 💀</span>
-      </label>
-      <label class="check-label">
-        <input type="checkbox" id="mod-calamity">
-        Calamity Ring <span class="modifier-skulls">+3 💀</span>
-      </label>
-      <label class="check-label">
-        <input type="checkbox" id="mod-four-kings">
-        Must Kill Four Kings <span class="modifier-skulls">+2 💀</span>
-      </label>
-      <label class="check-label">
-        <input type="checkbox" id="mod-no-armor">
-        No Armor <span class="modifier-skulls">+2 💀</span>
-      </label>
-      <label class="check-label">
-        <input type="checkbox" id="mod-no-healing">
-        No Healing <span class="modifier-skulls">+4 💀</span>
-      </label>
-    </div>
-  </div>
-
   <button class="btn-generate" id="btn-generate" onclick="generate()">Roll Challenge Run</button>
 
   <!-- Result -->
@@ -687,6 +666,7 @@
     <div class="skull-meter" id="skull-meter">
       <div class="skull-rank">Difficulty</div>
       <div class="skull-icons" id="skull-icons"></div>
+      <div class="skull-breakdown" id="skull-breakdown"></div>
       <div class="skull-title" id="skull-title"></div>
       <div class="skull-taunt" id="skull-taunt"></div>
     </div>
@@ -730,6 +710,34 @@
       </div>
       <div class="res-name" id="res-armor">—</div>
       <div id="res-armor-notes"></div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="result-row" id="modifier-row">
+      <div class="panel-title">Challenge Modifiers</div>
+      <div class="modifier-grid">
+        <label class="check-label">
+          <input type="checkbox" id="mod-no-leveling" onchange="onModifierChange()">
+          No Leveling <span class="modifier-skulls">+5 💀</span>
+        </label>
+        <label class="check-label">
+          <input type="checkbox" id="mod-calamity" onchange="onModifierChange()">
+          Calamity Ring <span class="modifier-skulls">+4 💀</span>
+        </label>
+        <label class="check-label">
+          <input type="checkbox" id="mod-four-kings" onchange="onModifierChange()">
+          Must Kill Four Kings <span class="modifier-skulls">+2 💀</span>
+        </label>
+        <label class="check-label">
+          <input type="checkbox" id="mod-no-armor" onchange="onModifierChange()">
+          No Armor <span class="modifier-skulls">+2 💀</span>
+        </label>
+        <label class="check-label">
+          <input type="checkbox" id="mod-no-healing" onchange="onModifierChange()">
+          No Healing <span class="modifier-skulls">+4 💀</span>
+        </label>
+      </div>
     </div>
 
     <button class="btn-copy-link" id="btn-copy-link" onclick="copyShareLink()">📋 Copy Share Link</button>
@@ -1535,7 +1543,14 @@
   function calculateSkulls() {
     const base = WEAPON_DIFFICULTY[currentWeapon] || 3;
     const modSkulls = getActiveModifiers().reduce((sum, m) => sum + m.skulls, 0);
-    return base + modSkulls;
+    const shieldMode = document.querySelector('input[name="shield"]:checked').value;
+    const noShieldSkulls = shieldMode === 'none' ? 3 : 0;
+    return base + modSkulls + noShieldSkulls;
+  }
+
+  function onModifierChange() {
+    renderSkulls();
+    updateShareHash();
   }
 
   function renderSkulls() {
@@ -1543,6 +1558,14 @@
     const display = Math.min(total, 12); // cap visual skulls
     const iconsEl = document.getElementById('skull-icons');
     iconsEl.textContent = '💀'.repeat(display) + (total > 12 ? '+' : '');
+
+    // Breakdown
+    const base = WEAPON_DIFFICULTY[currentWeapon] || 3;
+    const parts = [`${currentWeapon}: ${base}💀`];
+    const shieldMode = document.querySelector('input[name="shield"]:checked').value;
+    if (shieldMode === 'none') parts.push('No Shield: +3💀');
+    getActiveModifiers().forEach(m => parts.push(`${m.label}: +${m.skulls}💀`));
+    document.getElementById('skull-breakdown').textContent = parts.join(' · ');
 
     // Fire effects
     iconsEl.className = 'skull-icons';
@@ -1611,9 +1634,11 @@
     document.getElementById('panel-weapon-pool').style.display = 'none';
     document.getElementById('panel-shield').style.display = 'none';
     document.getElementById('panel-armor').style.display = 'none';
-    document.getElementById('panel-modifiers').style.display = 'none';
     document.getElementById('warn-empty').style.display = 'none';
     document.getElementById('btn-generate').style.display = 'none';
+
+    // Collapse rules reference in shared view
+    document.querySelector('details.rules').removeAttribute('open');
 
     // Set radio buttons so renderShield/renderArmor logic works
     document.querySelector(`input[name="shield"][value="${state.h}"]`).checked = true;
@@ -1669,6 +1694,9 @@
 
     // Hide reroll buttons in shared view
     document.querySelectorAll('.reroll-btn').forEach(btn => btn.style.display = 'none');
+
+    // Make modifier checkboxes read-only in shared view
+    document.querySelectorAll('#modifier-row input[type="checkbox"]').forEach(cb => { cb.disabled = true; });
 
     // Hide copy link button, show randomizer button
     document.getElementById('btn-copy-link').style.display = 'none';
@@ -1743,7 +1771,6 @@
     document.getElementById('panel-weapon-pool').style.display = 'none';
     document.getElementById('panel-shield').style.display = 'none';
     document.getElementById('panel-armor').style.display = 'none';
-    document.getElementById('panel-modifiers').style.display = 'none';
     document.getElementById('warn-empty').style.display = 'none';
     // Disable and restyle the generate button
     const sealEmojis = ['⚔️', '🔥', '⛓️', '💀', '🗡️', '☠️'];
