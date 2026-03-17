@@ -350,9 +350,10 @@
         <li>Unique / Boss weapons are <strong>not upgraded</strong>.</li>
         <li>The Pyromancy Flame starts at <strong>+15</strong>.</li>
         <li>You may freely use <strong>left-hand</strong> weapons found in-game.</li>
+        <li>For any build, you may use an unupgraded <strong>Pyromancy Flame</strong> with <strong>Power Within</strong> in your off-hand once you obtain the items in your run.</li>
         <li>If your weapon is a <strong>bow</strong>, you may give yourself <strong>999 basic Arrows</strong>.</li>
         <li>If your weapon is a <strong>crossbow</strong>, you may give yourself <strong>999 basic Bolts</strong>.</li>
-        <li>If your weapon is a <strong>flame, catalyst, or talisman</strong>, you may start with one damaging spell whose stat requirement is <strong>≤ 30</strong>.</li>
+        <li>If your weapon is a <strong>flame, catalyst, or talisman</strong>, you may start with 30 in your main stat and one damaging spell whose stat requirement is <strong>≤ 30</strong>.</li>
       </ul>
       <h3>Shield (if enabled)</h3>
       <ul>
@@ -754,7 +755,7 @@
     }
 
     if (cat === 'flame' || cat === 'catalyst' || cat === 'talisman') {
-      notesEl.innerHTML += `<div class="note-box">You may start with <strong>one damaging spell</strong> whose stat requirement is <strong>≤ 30</strong>.</div>`;
+      notesEl.innerHTML += `<div class="note-box">You may start with 30 in your main stat and <strong>one damaging spell</strong> whose stat requirement is <strong>≤ 30</strong>.</div>`;
     }
 
     // Shield
