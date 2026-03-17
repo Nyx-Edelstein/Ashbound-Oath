@@ -634,6 +634,29 @@
     ]
   };
 
+  const NO_SHIELD_STYLES = [
+    {
+      name: "Dual Wield",
+      note: "Off-hand weapon of your choice."
+    },
+    {
+      name: "Two-Hand Only",
+      note: "You must two-hand your weapon at all times. No off-hand weapon or item."
+    },
+    {
+      name: "Catalyst Off-hand",
+      note: "Start with a catalyst in your off-hand and one of the following spells: <strong>Great Soul Arrow</strong>, <strong>Homing Soulmass</strong>, or <strong>Great Magic Weapon</strong>."
+    },
+    {
+      name: "Talisman Off-hand",
+      note: "Start with a talisman in your off-hand and one of the following miracles: <strong>Lightning Spear</strong>, <strong>Emit Force</strong>, or <strong>Heal</strong>."
+    },
+    {
+      name: "Pyromancy Flame Off-hand",
+      note: "Start with a Pyromancy Flame (+10) in your off-hand and one of the following pyromancies: <strong>Fire Orb</strong>, <strong>Great Fireball</strong>, <strong>Power Within</strong>, or <strong>Combustion</strong>."
+    }
+  ];
+
   const SHIELDS = [
     "Small Leather Shield", "Leather Shield", "Target Shield", "Buckler",
     "Cracked Round Shield", "Warrior's Round Shield", "Red & White Round Shield",
@@ -747,8 +770,10 @@
       shieldRow.style.display = 'block';
       shieldDivider.style.display = 'block';
     } else if (shieldMode === 'none') {
-      document.getElementById('res-shield').textContent = 'No Shield';
-      shieldNotesEl.innerHTML = '<div class="note-box">You may not equip any shield for the entire run.</div>';
+      const style = pick(NO_SHIELD_STYLES);
+      document.getElementById('res-shield').textContent = 'No Shield — ' + style.name;
+      shieldNotesEl.innerHTML = '<div class="note-box">You may not equip any shield for the entire run. Suggestion:</div>'
+        + `<div class="note-box">${style.note}</div>`;
       shieldRow.style.display = 'block';
       shieldDivider.style.display = 'block';
     } else {
