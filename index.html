@@ -552,7 +552,8 @@
       <h3>Shield (if enabled)</h3>
       <ul>
         <li><strong>Random Shield:</strong> You may only use the rolled shield. No other shields may be equipped.</li>
-        <li><strong>No Shield:</strong> You may not equip any shield for the entire run. An off-hand style suggestion will be rolled (e.g. dual wield, two-hand only, or a casting tool with a starting spell).</li>
+        <li><strong>No Shield (Two-Hand or Dual Wield):</strong> You may not equip any shield. Two-hand your weapon or dual wield any off-hand weapon you scavenge during your run.</li>
+        <li><strong>No Shield (Caster Off-Hand):</strong> You may not equip any shield. Use a catalyst, talisman, or pyromancy flame in your off-hand with a starting spell.</li>
         <li><strong>No Restrictions:</strong> Equip any shield freely. Shields are separate from left-hand weapons.</li>
       </ul>
       <h3>Armor (if enabled)</h3>
@@ -621,9 +622,15 @@
         </span>
       </label>
       <label class="radio-label">
-        <input type="radio" name="shield" value="none" onchange="renderPreviewSkulls()">
-        <span>No Shield <span class="modifier-skulls">+3 💀</span>
-          <span class="sublabel">You may not equip any shield for the entire run.</span>
+        <input type="radio" name="shield" value="none-physical" onchange="renderPreviewSkulls()">
+        <span>No Shield (Two-Hand or Dual Wield) <span class="modifier-skulls">+4 💀</span>
+          <span class="sublabel">No shield. Two-hand your weapon or dual wield any off-hand weapon you scavenge during your run.</span>
+        </span>
+      </label>
+      <label class="radio-label">
+        <input type="radio" name="shield" value="none-caster" onchange="renderPreviewSkulls()">
+        <span>No Shield (Caster Off-Hand) <span class="modifier-skulls">+3 💀</span>
+          <span class="sublabel">No shield. Use a catalyst, talisman, or pyromancy flame in your off-hand with a starting spell.</span>
         </span>
       </label>
       <label class="radio-label">
@@ -901,31 +908,18 @@
     ]
   };
 
-  const NO_SHIELD_STYLES = [
-    {
-      name: "Dual Wield",
-      note: "Off-hand weapon of your choice.",
-      skulls: 1
-    },
-    {
-      name: "Two-Hand Only",
-      note: "You must two-hand your weapon at all times. No off-hand weapon or item.",
-      skulls: 1
-    },
+  const CASTER_OFFHAND_SUGGESTIONS = [
     {
       name: "Catalyst Off-hand",
-      note: "Start with a catalyst in your off-hand and one of the following spells: <strong>Great Soul Arrow</strong>, <strong>Homing Soulmass</strong>, or <strong>Great Magic Weapon</strong>.",
-      skulls: 0
+      note: "Start with a catalyst in your off-hand and one of the following spells: <strong>Great Soul Arrow</strong>, <strong>Homing Soulmass</strong>, or <strong>Great Magic Weapon</strong>."
     },
     {
       name: "Talisman Off-hand",
-      note: "Start with a talisman in your off-hand and one of the following miracles: <strong>Lightning Spear</strong>, <strong>Emit Force</strong>, or <strong>Heal</strong>.",
-      skulls: 0
+      note: "Start with a talisman in your off-hand and one of the following miracles: <strong>Lightning Spear</strong>, <strong>Emit Force</strong>, or <strong>Heal</strong>."
     },
     {
       name: "Pyromancy Flame Off-hand",
-      note: "Start with a Pyromancy Flame (+10) in your off-hand and one of the following pyromancies: <strong>Fire Orb</strong>, <strong>Great Fireball</strong>, <strong>Power Within</strong>, or <strong>Combustion</strong>.",
-      skulls: 0
+      note: "Start with a Pyromancy Flame (+10) in your off-hand and one of the following pyromancies: <strong>Fire Orb</strong>, <strong>Great Fireball</strong>, <strong>Power Within</strong>, or <strong>Combustion</strong>."
     }
   ];
 
@@ -1181,56 +1175,57 @@
   ];
 
   const OATH_BINDINGS = [
-    "you take up the {weapon}.",
     "the {weapon} is your burden to bear.",
     "you are bound to the {weapon}.",
     "your hand shall know only the {weapon}.",
-    "the {weapon} shall be your sole companion."
+    "the {weapon} shall bear witness to your trials.",
+    "the {weapon} is your curse and your salvation.",
   ];
 
   const OATH_CLOSINGS = [
     "May the Lords bear witness to your oath.",
     "Let ash mark your path to Anor Londo.",
     "Walk the path of cinder, or be consumed.",
-    "Prove your worth before the Lordvessel.",
     "Neither death nor hollowing shall release you.",
-    "Your oath is sealed — there is no turning back."
+    "Your oath is sealed — there is no turning back.",
   ];
   // stat indices: 0=VIT,1=ATT,2=END,3=STR,4=DEX,5=RES,6=INT,7=FTH
 
   // ── Skull rank titles ──
   const SKULL_RANKS = {
     1: ["Tarnished Worm","Unkindled Cur","Soul-Starved Beggar","Pestilent Drudge","Craven Maggot","Fireless Pretender","Spineless Hollow","Emberless Husk","Graveborn Leech","Ash-Forsaken Vermin"],
-    2: ["Curse-Ridden Lout","Filthbound Drifter","Ash-Choked Vagabond","Hollow-Eyed Miscreant","Forsaken Oaf","Oathbreaking Whelp","Fallen Scourge","Honorless Sellsword", "Gutterborn Dredge", "Charred Vagrant", "Hollow Scavenger"],
+    2: ["Curse-Ridden Lout","Filthbound Drifter","Ash-Choked Vagabond","Hollow-Eyed Miscreant","Forsaken Oaf","Oathbreaking Whelp","Fallen Scourge","Honorless Sellsword", "Gutterborn Dredge", "Charred Vagrant"],
     3: ["Maidenless Knave","Craven Fool","Wayward Knight","Dullblade Vagabond","Faithless Warrior","Wandering Blade","Faded Warrior","Aimless Drifter"],
-    4: ["Unproven Blade","Barely-Blooded Knight","Would-be Champion","Grim Contender", "Untested Knight"],
-    5: ["Kindled Warrior","Brave Soul","Steadfast Ashsworn","Flame-bound Knight","Ashen Vanguard","Oathbound Soldier", "Oathforged Knight", "Oathsworn Sword"],
-    7: ["Flame-Bearer","Ashen Paragon","Ever-Kindled Soul","Cinder-Hearted Champion"],
-    10: ["Flameforged Legend", "Banisher of the Dark", "Light of Lordran", "Relentless Flame"]
+    4: ["Unproven Blade","Barely-Blooded Knight","Would-be Champion","Grim Contender", "Untested Knight", "Untried Aspirant"],
+    5: ["Brave Soul","Flame-bound Knight","Ashen Vanguard","Oathbound Soldier", "Oathforged Knight", "Oathsworn Warrior", "Ashsworn Sword"],
+    7: ["Flame-Bearer","Ashen Paragon","Ever-Kindled Soul","Cinder-Hearted Champion", "Oathsworn Hero", "Flameforged Champion"],
+    10: ["Flameforged Legend", "Banisher of the Darkness", "Light of Lordran"]
   };
 
   // ── Taunts ──
   const SKULL_TAUNTS = {
     1: ["Is this the best you can muster? Why bother.",
-        "Even a Hollow could manage this. Surely you can do more.",
-        "The bonfire barely flickers, for effort this meager."],
-    2: ["A timid step into the dark. Where is your spine?",
+        "Even a Hollow could manage this. Surely you can do better.",
+        "The bonfire barely flickers for effort this meager."],
+    2: ["A timid step into the darkness. Where is your spine?",
         "You call this a challenge? The Crestfallen Warrior yawns.",
-        "Adequate… for an Undead with nothing to prove."],
+        "Adequate… for a spineless wretch. Barely worth the effort."],
     3: ["Passable. The flame acknowledges your presence, if little else.",
         "Neither bold nor craven. A gray path for a gray soul.",
-        "Respectable… for a Hollow. But the flame demands more."],
+        "Respectable… for a Maidenless Knave. One day you might earn a title worth bearing."],
     4: ["The fire burns brighter for those who dare. You have its attention.",
-        "A worthy test of skill. The Lords take notice.",
+        "A worthy test of skill. Someone is bound to take notice.",
         "Bold. The path ahead will break the unworthy."],
     5: ["The flame recognizes your resolve. Walk without fear.",
-        "Few would choose this road. Fewer still survive it.",
-        "You have earned the respect of ash and ember."],
-    7: ["A trial fit for a Lord. May your legend endure.",
-        "The flame roars in your honor. This oath will echo through the ages.",
-        "Lordran itself trembles before your resolve."],
-    10: ["A legend for the ages. The fire itself sings your praise.",
-         "Your name will be whispered in reverence and fear for generations to come.", "The very world bends to your indomitable will."]
+        "Few would choose this path. Your courage speaks to your strength.",
+        "The fire consumes the unworthy. Your oath proves your are not among them."],
+    7: ["Your resolve is as unyielding as the flame itself. Press onward.",
+        "It is a rare soul who dares to take up this challenge. The flame honors your courage.",
+        "Your tenacity is second to none. The fire respects your determination."],
+    10: ["Your soul is a beacon in the darkness. May your courage light the way for others to follow.",
+      "Your oath kindles the spirits of the hopeless. May your trial inspire others to rise.",
+      "Your soul burns with radiant intensity. Press onward so that others may find their way."],
+
   };
 
   // ── Modifier definitions ──
@@ -1254,7 +1249,6 @@
   let currentSecondary = null;
   let currentShield = null;
   let currentShieldStyle = null;
-  let currentStyleSkulls = 0;
   let currentArmor = null;
   let currentPool = [];
   const rerollsLeft = { weapon: 2, secondary: 2, shield: 2, armor: 2 };
@@ -1336,12 +1330,12 @@
       `<span class="category-tag">${CAT_LABELS[cat]}</span>`;
 
     let upgradeText = '';
-    if (cat === 'unique')                       upgradeText = 'No upgrades';
+    if (cat === 'unique')                       upgradeText = 'Start upgraded';
     else if (cat === 'normal')                  upgradeText = 'Start at +5 or +10 — your discretion';
     else if (cat === 'flame')                   upgradeText = 'Start at +15';
     else if (cat === 'bow' || cat === 'crossbow') {
       const isUniqueBow = ["Darkmoon Bow", "Dragonslayer Greatbow", "Gough's Greatbow"].includes(weapon);
-      upgradeText = isUniqueBow ? 'No upgrades' : 'Start at +5 or +10 — your discretion';
+      upgradeText = isUniqueBow ? 'Start upgraded' : 'Start at +5 or +10 — your discretion';
     } else                                      upgradeText = 'No upgrade path';
     document.getElementById('res-upgrade').innerHTML = `<div class="note-box">${upgradeText}</div>`;
 
@@ -1375,14 +1369,12 @@
     shieldNotesEl.innerHTML = '';
 
     if (currentWeapon === 'Lifehunt Scythe & Bloodshield') {
-      currentStyleSkulls = 0;
       document.getElementById('res-shield').textContent = 'Bloodshield (included with weapon)';
       shieldNotesEl.innerHTML = '<div class="note-box">The Bloodshield is part of this weapon\'s set. Shield roll does not apply.</div>';
       document.getElementById('reroll-shield').style.display = 'none';
       shieldRow.style.display = 'block';
       shieldDivider.style.display = 'block';
     } else if (shieldMode === 'random') {
-      currentStyleSkulls = 0;
       const newShield = SHIELDS.length > 1 ? pickExcluding(SHIELDS, currentShield) : pick(SHIELDS);
       currentShield = newShield;
       document.getElementById('res-shield').textContent = newShield;
@@ -1390,28 +1382,32 @@
       document.getElementById('reroll-shield').style.display = '';
       shieldRow.style.display = 'block';
       shieldDivider.style.display = 'block';
-    } else if (shieldMode === 'none') {
+    } else if (shieldMode === 'none-physical') {
+      document.getElementById('res-shield').textContent = 'No Shield — Two-Hand or Dual Wield';
+      shieldNotesEl.innerHTML = '<div class="note-box">You may not equip any shield for the entire run.</div>'
+        + '<div class="note-box">Two-hand your weapon or use any off-hand weapon you scavenge during your run.</div>';
+      document.getElementById('reroll-shield').style.display = 'none';
+      shieldRow.style.display = 'block';
+      shieldDivider.style.display = 'block';
+    } else if (shieldMode === 'none-caster') {
       const cat = currentWeaponCat;
-      let availableStyles = NO_SHIELD_STYLES;
+      let available = CASTER_OFFHAND_SUGGESTIONS;
       if (cat === 'flame' || cat === 'catalyst' || cat === 'talisman') {
         const dupeMap = { flame: 'Pyromancy Flame Off-hand', catalyst: 'Catalyst Off-hand', talisman: 'Talisman Off-hand' };
-        availableStyles = availableStyles.filter(s => s.name !== 'Two-Hand Only' && s.name !== dupeMap[cat]);
+        available = available.filter(s => s.name !== dupeMap[cat]);
       }
-      if (currentShieldStyle && availableStyles.length > 1) {
-        availableStyles = availableStyles.filter(s => s.name !== currentShieldStyle);
+      if (currentShieldStyle && available.length > 1) {
+        available = available.filter(s => s.name !== currentShieldStyle);
       }
-      const style = pick(availableStyles);
+      const style = pick(available);
       currentShieldStyle = style.name;
-      currentStyleSkulls = style.skulls;
-      const styleSkullText = style.skulls > 0 ? ` (+${style.skulls}💀)` : '';
-      document.getElementById('res-shield').textContent = 'No Shield — ' + style.name + styleSkullText;
+      document.getElementById('res-shield').textContent = 'No Shield — ' + style.name;
       shieldNotesEl.innerHTML = '<div class="note-box">You may not equip any shield for the entire run.</div>'
         + `<div class="note-box">Suggestion: ${style.note}</div>`;
       document.getElementById('reroll-shield').style.display = '';
       shieldRow.style.display = 'block';
       shieldDivider.style.display = 'block';
     } else {
-      currentStyleSkulls = 0;
       shieldRow.style.display = 'none';
       shieldDivider.style.display = 'none';
     }
@@ -1479,7 +1475,7 @@
     const base = WEAPON_DIFFICULTY[currentWeapon] || 3;
     const modSkulls = getActiveModifiers().reduce((sum, m) => sum + m.skulls, 0);
     const shieldMode = document.querySelector('input[name="shield"]:checked').value;
-    const shieldSkulls = shieldMode === 'none' ? 3 + currentStyleSkulls : shieldMode === 'random' ? 1 : -2;
+    const shieldSkulls = shieldMode === 'none-physical' ? 4 : shieldMode === 'none-caster' ? 3 : shieldMode === 'random' ? 1 : -2;
     const armorMode = document.querySelector('input[name="armor"]:checked').value;
     const armorSkulls = armorMode === 'random' ? 1 : armorMode === 'none' ? -2 : 0;
     const backupSkulls = document.getElementById('opt-backup').checked ? 0 : 1;
@@ -1504,7 +1500,7 @@
   function calculatePreviewSkulls() {
     const modSkulls = getActiveModifiers().reduce((sum, m) => sum + m.skulls, 0);
     const shieldMode = document.querySelector('input[name="shield"]:checked').value;
-    const shieldSkulls = shieldMode === 'none' ? 3 : shieldMode === 'random' ? 1 : -2;
+    const shieldSkulls = shieldMode === 'none-physical' ? 4 : shieldMode === 'none-caster' ? 3 : shieldMode === 'random' ? 1 : -2;
     const armorMode = document.querySelector('input[name="armor"]:checked').value;
     const armorSkulls = armorMode === 'random' ? 1 : armorMode === 'none' ? -2 : 0;
     const hasBackup = document.getElementById('opt-backup').checked;
@@ -1548,8 +1544,8 @@
     // Breakdown
     const parts = ['Weapon: 1–5💀'];
     const shieldMode = document.querySelector('input[name="shield"]:checked').value;
-    const shieldSkulls = shieldMode === 'none' ? 3 : shieldMode === 'random' ? 1 : -2;
-    const shieldLabels = { none: 'No Shield', random: 'Random Shield', free: 'No Shield Restriction' };
+    const shieldSkulls = shieldMode === 'none-physical' ? 4 : shieldMode === 'none-caster' ? 3 : shieldMode === 'random' ? 1 : -2;
+    const shieldLabels = { 'none-physical': 'No Shield (Two-Hand/Dual Wield)', 'none-caster': 'No Shield (Caster Off-Hand)', random: 'Random Shield', free: 'No Shield Restriction' };
     parts.push(`${shieldLabels[shieldMode]}: ${shieldSkulls > 0 ? '+' : ''}${shieldSkulls}💀`);
     const armorMode = document.querySelector('input[name="armor"]:checked').value;
     const armorSkulls = armorMode === 'random' ? 1 : armorMode === 'none' ? -2 : 0;
@@ -1565,9 +1561,9 @@
     iconsEl.className = 'skull-icons';
     if (minTotal >= 10) {
       iconsEl.classList.add('fire-high');
-    } else if (minTotal >= 8) {
+    } else if (minTotal >= 7) {
       iconsEl.classList.add('fire-high');
-    } else if (minTotal >= 6) {
+    } else if (minTotal >= 5) {
       iconsEl.classList.add('fire-low');
     }
 
@@ -1591,8 +1587,8 @@
     const base = WEAPON_DIFFICULTY[currentWeapon] || 3;
     const parts = [`${currentWeapon}: ${base}💀`];
     const shieldMode = document.querySelector('input[name="shield"]:checked').value;
-    const shieldSkulls = shieldMode === 'none' ? 3 + currentStyleSkulls : shieldMode === 'random' ? 1 : -2;
-    const shieldLabel = shieldMode === 'none' && currentShieldStyle ? `No Shield (${currentShieldStyle})` : ({ none: 'No Shield', random: 'Random Shield', free: 'No Shield Restriction' })[shieldMode];
+    const shieldSkulls = shieldMode === 'none-physical' ? 4 : shieldMode === 'none-caster' ? 3 : shieldMode === 'random' ? 1 : -2;
+    const shieldLabel = ({ 'none-physical': 'No Shield (Two-Hand/Dual Wield)', 'none-caster': 'No Shield (Caster Off-Hand)', random: 'Random Shield', free: 'No Shield Restriction' })[shieldMode];
     parts.push(`${shieldLabel}: ${shieldSkulls > 0 ? '+' : ''}${shieldSkulls}💀`);
     const armorMode = document.querySelector('input[name="armor"]:checked').value;
     const armorSkulls = armorMode === 'random' ? 1 : armorMode === 'none' ? -2 : 0;
