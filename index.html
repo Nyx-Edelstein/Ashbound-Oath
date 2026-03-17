@@ -778,8 +778,8 @@
     } else if (shieldMode === 'none') {
       const style = pick(NO_SHIELD_STYLES);
       document.getElementById('res-shield').textContent = 'No Shield — ' + style.name;
-      shieldNotesEl.innerHTML = '<div class="note-box">You may not equip any shield for the entire run. Suggestion:</div>'
-        + `<div class="note-box">${style.note}</div>`;
+      shieldNotesEl.innerHTML = '<div class="note-box">You may not equip any shield for the entire run.</div>'
+        + `<div class="note-box">Suggestion: ${style.note}</div>`;
       shieldRow.style.display = 'block';
       shieldDivider.style.display = 'block';
     } else {
