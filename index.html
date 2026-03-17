@@ -291,6 +291,49 @@
       color: #4a3a20;
     }
 
+    /* ── Reroll dice buttons ── */
+    .reroll-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: none;
+      border: 1px solid #3a2e18;
+      color: #b09060;
+      font-family: inherit;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      padding: 0.25rem 0.55rem;
+      border-radius: 3px;
+      cursor: pointer;
+      margin-left: 0.6rem;
+      vertical-align: middle;
+      transition: background 0.12s, border-color 0.12s, color 0.12s;
+    }
+
+    .reroll-btn:hover:not(:disabled) {
+      background: #201a0e;
+      border-color: #b08020;
+      color: #e8c870;
+    }
+
+    .reroll-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .btn-generate:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      border-color: #5a4a30;
+      color: #8a7a60;
+    }
+
+    .btn-generate:disabled:hover {
+      background: #1e1810;
+      box-shadow: none;
+      border-color: #5a4a30;
+    }
+
     /* ── Responsive ── */
     @media (max-width: 480px) {
       h1 { font-size: 1.5rem; }
@@ -456,24 +499,38 @@
 
   <div id="warn-empty">Select at least one weapon category to roll.</div>
 
-  <button class="btn-generate" onclick="generate()">Roll Challenge Run</button>
+  <button class="btn-generate" id="btn-generate" onclick="generate()">Roll Challenge Run</button>
 
   <!-- Result -->
   <div class="panel" id="result">
     <div class="panel-title">Your Run</div>
 
     <div class="result-row">
-      <div class="res-label">Starting Weapon</div>
+      <div class="res-label">Primary Weapon
+        <button class="reroll-btn" id="reroll-weapon" onclick="reroll('weapon')" title="Reroll primary weapon (2 rerolls remaining)">🎲 2</button>
+      </div>
       <div class="res-name" id="res-weapon">—</div>
       <div id="res-category"></div>
       <div id="res-upgrade"></div>
       <div id="res-notes"></div>
     </div>
 
+    <hr class="divider">
+
+    <div class="result-row">
+      <div class="res-label">Secondary Weapon
+        <button class="reroll-btn" id="reroll-secondary" onclick="reroll('secondary')" title="Reroll secondary weapon (2 rerolls remaining)">🎲 2</button>
+      </div>
+      <div class="res-name" id="res-secondary">—</div>
+      <div id="res-secondary-notes"></div>
+    </div>
+
     <hr class="divider" id="shield-divider" style="display:none">
 
     <div class="result-row" id="shield-row" style="display:none">
-      <div class="res-label">Shield</div>
+      <div class="res-label">Shield
+        <button class="reroll-btn" id="reroll-shield" onclick="reroll('shield')" title="Reroll shield (2 rerolls remaining)">🎲 2</button>
+      </div>
       <div class="res-name" id="res-shield">—</div>
       <div id="res-shield-notes"></div>
     </div>
@@ -481,7 +538,9 @@
     <hr class="divider" id="armor-divider" style="display:none">
 
     <div class="result-row" id="armor-row" style="display:none">
-      <div class="res-label">Armor Set</div>
+      <div class="res-label">Armor Set
+        <button class="reroll-btn" id="reroll-armor" onclick="reroll('armor')" title="Reroll armor set (2 rerolls remaining)">🎲 2</button>
+      </div>
       <div class="res-name" id="res-armor">—</div>
       <div id="res-armor-notes"></div>
     </div>
@@ -690,6 +749,16 @@
     "Warrior Set", "Witch Set", "Xanthous Set"
   ];
 
+  // Normal weapons minus unsafe picks (greatbows, fist, dagger variants, whips)
+  const SAFE_NORMAL_WEAPONS = WEAPONS.normal.filter(w =>
+    !["Whip", "Notched Whip"].includes(w)
+  );
+
+  const UNSAFE_UNIQUE = new Set([
+    "Dragon Bone Fist", "Priscilla's Dagger",
+    "Dragonslayer Greatbow", "Gough's Greatbow"
+  ]);
+
   const CAT_LABELS = {
     unique:   "Unique / Boss",
     normal:   "Normal",
@@ -700,40 +769,65 @@
     crossbow: "Crossbow"
   };
 
+  // ── State ──
+  let currentWeapon = null;
+  let currentWeaponCat = null;
+  let currentSecondary = null;
+  let currentPool = [];
+  const rerollsLeft = { weapon: 2, secondary: 2, shield: 2, armor: 2 };
+
   function pick(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
   }
 
-  function generate() {
-    const warn = document.getElementById('warn-empty');
+  function pickExcluding(arr, exclude) {
+    const filtered = arr.filter(x => x !== exclude);
+    return pick(filtered);
+  }
 
-    // Build weighted pool
-    const pool = [];
-    if (document.getElementById('pool-unique').checked)   WEAPONS.unique.forEach(w    => pool.push({ w, cat: 'unique' }));
-    if (document.getElementById('pool-normal').checked)   WEAPONS.normal.forEach(w    => pool.push({ w, cat: 'normal' }));
-    if (document.getElementById('pool-flame').checked)    WEAPONS.flame.forEach(w     => pool.push({ w, cat: 'flame' }));
-    if (document.getElementById('pool-catalyst').checked) WEAPONS.catalyst.forEach(w  => pool.push({ w, cat: 'catalyst' }));
-    if (document.getElementById('pool-talisman').checked) WEAPONS.talisman.forEach(w  => pool.push({ w, cat: 'talisman' }));
-    if (document.getElementById('pool-bow').checked)      WEAPONS.bow.forEach(w       => pool.push({ w, cat: 'bow' }));
-    if (document.getElementById('pool-crossbow').checked) WEAPONS.crossbow.forEach(w  => pool.push({ w, cat: 'crossbow' }));
+  function rollSecondary(excludeWeapon) {
+    return pickExcluding(SAFE_NORMAL_WEAPONS, excludeWeapon);
+  }
 
-    if (pool.length === 0) {
-      warn.style.display = 'block';
-      document.getElementById('result').style.display = 'none';
-      return;
+  function updateRerollButton(id, category) {
+    const btn = document.getElementById(id);
+    const left = rerollsLeft[category];
+    btn.textContent = '🎲 ' + left;
+    btn.title = left > 0
+      ? `Reroll ${category} (${left} reroll${left !== 1 ? 's' : ''} remaining)`
+      : 'No rerolls remaining';
+    btn.disabled = left <= 0;
+  }
+
+  function reroll(category) {
+    if (rerollsLeft[category] <= 0) return;
+    rerollsLeft[category]--;
+
+    if (category === 'weapon') {
+      if (currentPool.length === 0) return;
+      const { w, cat } = pick(currentPool);
+      currentWeapon = w;
+      currentWeaponCat = cat;
+      renderWeapon(w, cat);
+      // Re-render shield in case Lifehunt was rolled
+      renderShield();
+    } else if (category === 'secondary') {
+      currentSecondary = rollSecondary(currentWeapon);
+      renderSecondary(currentSecondary);
+    } else if (category === 'shield') {
+      renderShield();
+    } else if (category === 'armor') {
+      renderArmor();
     }
-    warn.style.display = 'none';
 
-    const { w: weapon, cat } = pick(pool);
+    updateRerollButton('reroll-' + category, category);
+  }
 
-    // Weapon name
+  function renderWeapon(weapon, cat) {
     document.getElementById('res-weapon').textContent = weapon;
-
-    // Category tag
     document.getElementById('res-category').innerHTML =
       `<span class="category-tag">${CAT_LABELS[cat]}</span>`;
 
-    // Upgrade level
     let upgradeText = '';
     if (cat === 'unique')                       upgradeText = 'No upgrades';
     else if (cat === 'normal')                  upgradeText = 'Start at +5 or +10 — your discretion';
@@ -744,28 +838,32 @@
     } else                                      upgradeText = 'No upgrade path';
     document.getElementById('res-upgrade').innerHTML = `<div class="note-box">${upgradeText}</div>`;
 
-    // Special notes
     const notesEl = document.getElementById('res-notes');
     notesEl.innerHTML = '';
-
     if (cat === 'bow') {
       notesEl.innerHTML += `<div class="note-box">You may give yourself <strong>999 Arrows</strong>.</div>`;
     } else if (cat === 'crossbow') {
       notesEl.innerHTML += `<div class="note-box">You may give yourself <strong>999 Bolts</strong>.</div>`;
     }
-
     if (cat === 'flame' || cat === 'catalyst' || cat === 'talisman') {
       notesEl.innerHTML += `<div class="note-box">You may start with 30 in your main stat and <strong>one damaging spell</strong> whose stat requirement is <strong>≤ 30</strong>.</div>`;
     }
+  }
 
-    // Shield
+  function renderSecondary(weapon) {
+    document.getElementById('res-secondary').textContent = weapon;
+    document.getElementById('res-secondary-notes').innerHTML =
+      '<div class="note-box">Backup weapon. Starts at <strong>+5 or +10</strong> — your discretion. You are not required to use both, but this provides some flexibility.</div>';
+  }
+
+  function renderShield() {
     const shieldMode    = document.querySelector('input[name="shield"]:checked').value;
     const shieldRow     = document.getElementById('shield-row');
     const shieldDivider = document.getElementById('shield-divider');
     const shieldNotesEl = document.getElementById('res-shield-notes');
     shieldNotesEl.innerHTML = '';
 
-    if (weapon === 'Lifehunt Scythe & Bloodshield') {
+    if (currentWeapon === 'Lifehunt Scythe & Bloodshield') {
       document.getElementById('res-shield').textContent = 'Bloodshield (included with weapon)';
       shieldNotesEl.innerHTML = '<div class="note-box">The Bloodshield is part of this weapon\'s set. Shield roll does not apply.</div>';
       shieldRow.style.display = 'block';
@@ -776,9 +874,12 @@
       shieldRow.style.display = 'block';
       shieldDivider.style.display = 'block';
     } else if (shieldMode === 'none') {
-      const availableStyles = (cat === 'flame' || cat === 'catalyst' || cat === 'talisman')
-        ? NO_SHIELD_STYLES.filter(s => s.name !== 'Two-Hand Only')
-        : NO_SHIELD_STYLES;
+      const cat = currentWeaponCat;
+      let availableStyles = NO_SHIELD_STYLES;
+      if (cat === 'flame' || cat === 'catalyst' || cat === 'talisman') {
+        const dupeMap = { flame: 'Pyromancy Flame Off-hand', catalyst: 'Catalyst Off-hand', talisman: 'Talisman Off-hand' };
+        availableStyles = availableStyles.filter(s => s.name !== 'Two-Hand Only' && s.name !== dupeMap[cat]);
+      }
       const style = pick(availableStyles);
       document.getElementById('res-shield').textContent = 'No Shield — ' + style.name;
       shieldNotesEl.innerHTML = '<div class="note-box">You may not equip any shield for the entire run.</div>'
@@ -789,8 +890,9 @@
       shieldRow.style.display = 'none';
       shieldDivider.style.display = 'none';
     }
+  }
 
-    // Armor
+  function renderArmor() {
     const armorMode     = document.querySelector('input[name="armor"]:checked').value;
     const armorRow      = document.getElementById('armor-row');
     const armorDivider  = document.getElementById('armor-divider');
@@ -817,6 +919,58 @@
       armorRow.style.display = 'none';
       armorDivider.style.display = 'none';
     }
+  }
+
+  function generate() {
+    const warn = document.getElementById('warn-empty');
+
+    // Build weighted pool
+    const pool = [];
+    if (document.getElementById('pool-unique').checked)   WEAPONS.unique.forEach(w    => pool.push({ w, cat: 'unique' }));
+    if (document.getElementById('pool-normal').checked)   WEAPONS.normal.forEach(w    => pool.push({ w, cat: 'normal' }));
+    if (document.getElementById('pool-flame').checked)    WEAPONS.flame.forEach(w     => pool.push({ w, cat: 'flame' }));
+    if (document.getElementById('pool-catalyst').checked) WEAPONS.catalyst.forEach(w  => pool.push({ w, cat: 'catalyst' }));
+    if (document.getElementById('pool-talisman').checked) WEAPONS.talisman.forEach(w  => pool.push({ w, cat: 'talisman' }));
+    if (document.getElementById('pool-bow').checked)      WEAPONS.bow.forEach(w       => pool.push({ w, cat: 'bow' }));
+    if (document.getElementById('pool-crossbow').checked) WEAPONS.crossbow.forEach(w  => pool.push({ w, cat: 'crossbow' }));
+
+    if (pool.length === 0) {
+      warn.style.display = 'block';
+      document.getElementById('result').style.display = 'none';
+      return;
+    }
+    warn.style.display = 'none';
+
+    // Store pool and roll
+    currentPool = pool;
+    const { w: weapon, cat } = pick(pool);
+    currentWeapon = weapon;
+    currentWeaponCat = cat;
+
+    // Primary weapon
+    renderWeapon(weapon, cat);
+
+    // Secondary weapon (always safe normal, different from primary)
+    currentSecondary = rollSecondary(weapon);
+    renderSecondary(currentSecondary);
+
+    // Shield
+    renderShield();
+
+    // Armor
+    renderArmor();
+
+    // Reset reroll counters
+    rerollsLeft.weapon = 2;
+    rerollsLeft.secondary = 2;
+    rerollsLeft.shield = 2;
+    rerollsLeft.armor = 2;
+    ['weapon', 'secondary', 'shield', 'armor'].forEach(c => updateRerollButton('reroll-' + c, c));
+
+    // Disable the generate button
+    const btn = document.getElementById('btn-generate');
+    btn.disabled = true;
+    btn.textContent = 'Oath Sealed';
 
     // Show result with fresh animation
     const resultEl = document.getElementById('result');
