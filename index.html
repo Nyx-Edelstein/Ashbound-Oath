@@ -765,7 +765,12 @@
     const shieldNotesEl = document.getElementById('res-shield-notes');
     shieldNotesEl.innerHTML = '';
 
-    if (shieldMode === 'random') {
+    if (weapon === 'Lifehunt Scythe & Bloodshield') {
+      document.getElementById('res-shield').textContent = 'Bloodshield (included with weapon)';
+      shieldNotesEl.innerHTML = '<div class="note-box">The Bloodshield is part of this weapon\'s set. Shield roll does not apply.</div>';
+      shieldRow.style.display = 'block';
+      shieldDivider.style.display = 'block';
+    } else if (shieldMode === 'random') {
       document.getElementById('res-shield').textContent = pick(SHIELDS);
       shieldNotesEl.innerHTML = '<div class="note-box">You may only use this shield. You may not equip any other shield found in-game.</div>';
       shieldRow.style.display = 'block';
