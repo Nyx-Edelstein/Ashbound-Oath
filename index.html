@@ -757,6 +757,153 @@
     "Warrior Set", "Witch Set", "Xanthous Set"
   ];
 
+  // ── Thematic armor groups ──
+  const ARMOR_GROUPS = {
+    knight:      ["Knight Set", "Elite Knight Set", "Balder Set", "Chain Set", "Steel Set", "Iron Set", "Warrior Set"],
+    anorLondo:   ["Silver Knight Set", "Ornstein's Set", "Brass Set", "Giant Armor Set", "Iron Golem Set", "Favor Set", "Great Lord Set"],
+    blackKnight: ["Black Knight Set", "Black Iron Set"],
+    holy:        ["Cleric Set", "Holy Set", "Paladin Set", "Dingy Set", "Maiden Set"],
+    sorcery:     ["Sorcerer Set", "Big Hat's Set", "Black Sorcerer Set", "Antiquated Set", "Crystalline Set", "Gwyndolin Moonlight Set", "Channeler Set", "Xanthous Set"],
+    chaos:       ["Pyromancer Set", "Gold-Hemmed Black Set", "Witch Set", "Crimson Set"],
+    heavy:       ["Havel's Set", "Catarina Set", "Giant Armor Set", "Smough's Set", "Black Iron Set", "Stone Knight Set", "Gough's Set", "Iron Golem Set"],
+    assassin:    ["Thief Set", "Shadow Set", "Hollow Thief Set", "Black Set", "Painting Guardian Set", "Chester's Set", "Lord's Blade Set", "Bandit Set"],
+    eastern:     ["Eastern Set", "Wanderer Set", "Shadow Set"],
+    dark:        ["Artorias' Set", "Dark Set", "Lord's Blade Set", "Thorns Set", "Chester's Set"],
+    dragon:      ["Guardian Set", "Stone Knight Set", "Gough's Set"],
+    undead:      ["Hollow Soldier Set", "Hollow Warrior Set", "Hollow Thief Set", "Adventurer's Set", "Wanderer Set"],
+    hunter:      ["Hunter Set", "Wanderer Set", "Chester's Set", "Adventurer's Set", "Black Set"]
+  };
+
+  const WEAPON_ARMOR_MAP = {
+    // ── Unique / Boss ──
+    "Dragon Bone Fist":              ["dragon", "heavy"],
+    "Priscilla's Dagger":            ["assassin", "dark"],
+    "Silver Knight Str. Swd.":       ["anorLondo", "knight"],
+    "Astora's Str. Sword":           ["holy", "knight"],
+    "Drake Sword":                   ["dragon", "knight"],
+    "Black Knight Sword":            ["blackKnight"],
+    "Stone Greatsword":              ["heavy", "dragon"],
+    "Cursed Greatsword of Artorias": ["dark"],
+    "Greatsword of Artorias":        ["dark", "knight"],
+    "Great Lord Greatsword":         ["anorLondo"],
+    "Moonlight Greatsword":          ["sorcery"],
+    "Black Knight Greatsword":       ["blackKnight"],
+    "Dragon Greatsword":             ["dragon", "heavy"],
+    "Jagged Ghost Blade":            ["dark", "assassin"],
+    "Quelaag's Furysword":           ["chaos"],
+    "Gravelord Sword":               ["dark", "undead"],
+    "Velka's Rapier":                ["sorcery", "dark"],
+    "Crescent Axe":                  ["holy"],
+    "Golem Axe":                     ["anorLondo", "heavy"],
+    "Black Knight Greataxe":         ["blackKnight"],
+    "Dragon King Greataxe":          ["dragon", "heavy"],
+    "Blacksmith Giant Hammer":       ["anorLondo", "heavy"],
+    "Hammer of Vamos":               ["heavy", "undead"],
+    "Grant":                         ["holy", "heavy"],
+    "Dragon Tooth":                  ["heavy", "dragon"],
+    "Smough's Hammer":               ["anorLondo", "heavy"],
+    "Channeler's Trident":           ["sorcery"],
+    "Demon's Spear":                 ["chaos", "knight"],
+    "Silver Knight Spear":           ["anorLondo", "knight"],
+    "Moonlight Butterfly Horn":      ["sorcery", "holy"],
+    "Dragonslayer Spear":            ["anorLondo", "knight"],
+    "Giant's Halberd":               ["anorLondo", "heavy"],
+    "Titanite Catch Pole":           ["heavy"],
+    "Black Knight Halberd":          ["blackKnight"],
+    "Lifehunt Scythe & Bloodshield": ["dark", "assassin"],
+    "Dark Silver Tracer":            ["dark", "assassin"],
+    "Abyss Greatsword":              ["dark"],
+    "Obsidian Greatsword":           ["dragon"],
+    "Gold Tracer":                   ["dark", "assassin"],
+    "Stone Greataxe":                ["heavy", "dragon"],
+    // ── Normal ──
+    "Cestus":                  ["assassin", "undead"],
+    "Claw":                    ["assassin"],
+    "Dagger":                  ["assassin", "undead"],
+    "Bandit's Knife":          ["assassin"],
+    "Shortsword":              ["knight", "undead"],
+    "Longsword":               ["knight"],
+    "Broadsword":              ["knight"],
+    "Balder Side Sword":       ["knight", "anorLondo"],
+    "Sunlight Straight Sword": ["holy", "knight"],
+    "Barbed Straight Sword":   ["dark"],
+    "Darksword":               ["dark"],
+    "Bastard Sword":           ["knight"],
+    "Claymore":                ["knight"],
+    "Man-Serpent Greatsword":  ["heavy"],
+    "Flamberge":               ["knight", "heavy"],
+    "Zweihander":              ["heavy"],
+    "Greatsword":              ["heavy"],
+    "Demon Great Machete":     ["chaos", "heavy"],
+    "Scimitar":                ["assassin", "eastern"],
+    "Falchion":                ["knight", "eastern"],
+    "Shotel":                  ["assassin"],
+    "Painting Guardian Sword": ["assassin", "anorLondo"],
+    "Uchigatana":              ["eastern"],
+    "Washing Pole":            ["eastern"],
+    "Iaito":                   ["eastern"],
+    "Server":                  ["eastern"],
+    "Murakumo":                ["eastern"],
+    "Rapier":                  ["knight", "assassin"],
+    "Estoc":                   ["knight"],
+    "Ricard's Rapier":         ["knight"],
+    "Hand Axe":                ["undead"],
+    "Battle Axe":              ["knight", "undead"],
+    "Butcher Knife":           ["heavy", "undead"],
+    "Gargoyle Tail Axe":       ["knight"],
+    "Greataxe":                ["heavy"],
+    "Demon's Greataxe":        ["chaos", "heavy"],
+    "Club":                    ["undead"],
+    "Mace":                    ["holy", "undead"],
+    "Morning Star":            ["holy", "undead"],
+    "War Pick":                ["knight", "undead"],
+    "Pickaxe":                 ["heavy", "undead"],
+    "Reinforced Club":         ["undead"],
+    "Blacksmith Hammer":       ["heavy"],
+    "Great Club":              ["heavy"],
+    "Demon's Great Hammer":    ["chaos", "heavy"],
+    "Large Club":              ["heavy"],
+    "Spear":                   ["knight"],
+    "Winged Spear":            ["knight", "holy"],
+    "Partizan":                ["knight"],
+    "Pike":                    ["knight", "heavy"],
+    "Halberd":                 ["knight"],
+    "Gargoyle's Halberd":      ["knight"],
+    "Lucerne":                 ["knight"],
+    "Scythe":                  ["undead"],
+    "Great Scythe":            ["dark", "undead"],
+    "Whip":                    ["undead"],
+    "Notched Whip":            ["dark"],
+    "Four-Pronged Plow":       ["undead"],
+    "Guardian Tail":           ["dragon", "knight"],
+    // ── Bows ──
+    "Short Bow":               ["hunter", "undead"],
+    "Composite Bow":           ["hunter"],
+    "Longbow":                 ["hunter"],
+    "Black Bow of Pharis":     ["hunter"],
+    "Darkmoon Bow":            ["dark", "hunter"],
+    "Dragonslayer Greatbow":   ["anorLondo", "heavy"],
+    "Gough's Greatbow":        ["heavy", "dragon"],
+    // ── Crossbows ──
+    "Light Crossbow":          ["hunter", "undead"],
+    "Heavy Crossbow":          ["hunter", "heavy"],
+    "Sniper Crossbow":         ["hunter"],
+    "Avelyn":                  ["sorcery", "hunter"],
+    // ── Casting tools ──
+    "Pyromancy Flame +15":     ["chaos"]
+  };
+  // All catalysts → sorcery, all talismans → holy
+  WEAPONS.catalyst.forEach(w => { WEAPON_ARMOR_MAP[w] = ["sorcery"]; });
+  WEAPONS.talisman.forEach(w => { WEAPON_ARMOR_MAP[w] = ["holy"]; });
+
+  function getThematicArmor(weapon) {
+    const groups = WEAPON_ARMOR_MAP[weapon];
+    if (!groups) return ARMOR_SETS;
+    const sets = new Set();
+    groups.forEach(g => ARMOR_GROUPS[g].forEach(s => sets.add(s)));
+    return [...sets];
+  }
+
   // Normal weapons minus unsafe picks (greatbows, fist, dagger variants, whips)
   const SAFE_NORMAL_WEAPONS = WEAPONS.normal.filter(w =>
     !["Whip", "Notched Whip", "Four-Pronged Plow", "Guardian Tail"].includes(w)
@@ -783,6 +930,7 @@
   let currentWeaponCat = null;
   let currentSecondary = null;
   let currentPool = [];
+  let armorThematic = false;
   const rerollsLeft = { weapon: 2, secondary: 2, shield: 2, armor: 2 };
 
   function pick(arr) {
@@ -826,13 +974,15 @@
       // Only re-render shield if Lifehunt status changed
       const nowIsLifehunt = w === 'Lifehunt Scythe & Bloodshield';
       if (prevWasLifehunt !== nowIsLifehunt) renderShield();
+      armorThematic = true;
     } else if (category === 'secondary') {
       currentSecondary = rollSecondary(currentWeapon, currentWeaponCat);
       renderSecondary(currentSecondary);
     } else if (category === 'shield') {
       renderShield();
     } else if (category === 'armor') {
-      renderArmor();
+      renderArmor(armorThematic);
+      armorThematic = false;
     }
 
     updateRerollButton('reroll-' + category, category);
@@ -914,7 +1064,7 @@
     }
   }
 
-  function renderArmor() {
+  function renderArmor(thematic) {
     const armorMode     = document.querySelector('input[name="armor"]:checked').value;
     const armorRow      = document.getElementById('armor-row');
     const armorDivider  = document.getElementById('armor-divider');
@@ -928,7 +1078,8 @@
     </div>`;
 
     if (armorMode === 'random') {
-      document.getElementById('res-armor').textContent = pick(ARMOR_SETS);
+      const armorPool = thematic ? getThematicArmor(currentWeapon) : ARMOR_SETS;
+      document.getElementById('res-armor').textContent = pick(armorPool);
       armorNotesEl.innerHTML = sharedArmorNote;
       document.getElementById('reroll-armor').style.display = '';
       armorRow.style.display = 'block';
@@ -981,8 +1132,8 @@
     // Shield
     renderShield();
 
-    // Armor
-    renderArmor();
+    // Armor (first roll uses thematic match)
+    renderArmor(true);
 
     // Reset reroll counters
     rerollsLeft.weapon = 2;
