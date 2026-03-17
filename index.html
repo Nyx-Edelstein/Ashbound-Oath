@@ -349,7 +349,7 @@
         <li>Normal weapons start at <strong>+5 or +10</strong> — your discretion. Note: Some upgrade paths require +5 to start.</li>
         <li>Unique / Boss weapons are <strong>not upgraded</strong>.</li>
         <li>The Pyromancy Flame starts at <strong>+15</strong>.</li>
-        <li>You may freely use <strong>left-hand</strong> weapons found in-game.</li>
+        <li>You may freely use <strong>left-hand</strong> weapons found in your run.</li>
         <li>For any build, you may use an unupgraded <strong>Pyromancy Flame</strong> with <strong>Power Within</strong> in your off-hand once you obtain the items in your run.</li>
         <li>If your weapon is a <strong>bow</strong>, you may give yourself <strong>999 basic Arrows</strong>.</li>
         <li>If your weapon is a <strong>crossbow</strong>, you may give yourself <strong>999 basic Bolts</strong>.</li>
@@ -362,8 +362,8 @@
       </ul>
       <h3>Armor (if enabled)</h3>
       <ul>
-        <li>You may not equip any other armor found in-game.</li>
-        <li>The <strong>helm</strong> may be unequipped, or swapped for special items once obtained in-game (Sunlight Maggot, Dusk Crown, Masks, etc).</li>
+        <li>You may not equip any other armor found in your run.</li>
+        <li>The <strong>helm</strong> may be unequipped, or swapped for special items once obtained in your run (Dusk Crown, Masks, etc).</li>
         <li>You may give yourself the minimum <strong>Endurance</strong> to stay under 100% equip load (avoid over-encumbrance).</li>
       </ul>
     </div>
@@ -772,11 +772,14 @@
       shieldDivider.style.display = 'block';
     } else if (shieldMode === 'random') {
       document.getElementById('res-shield').textContent = pick(SHIELDS);
-      shieldNotesEl.innerHTML = '<div class="note-box">You may only use this shield. You may not equip any other shield found in-game.</div>';
+      shieldNotesEl.innerHTML = '<div class="note-box">You may only use this shield. You may not equip any other shield found in your run.</div>';
       shieldRow.style.display = 'block';
       shieldDivider.style.display = 'block';
     } else if (shieldMode === 'none') {
-      const style = pick(NO_SHIELD_STYLES);
+      const availableStyles = (cat === 'flame' || cat === 'catalyst' || cat === 'talisman')
+        ? NO_SHIELD_STYLES.filter(s => s.name !== 'Two-Hand Only')
+        : NO_SHIELD_STYLES;
+      const style = pick(availableStyles);
       document.getElementById('res-shield').textContent = 'No Shield — ' + style.name;
       shieldNotesEl.innerHTML = '<div class="note-box">You may not equip any shield for the entire run.</div>'
         + `<div class="note-box">Suggestion: ${style.note}</div>`;
@@ -795,8 +798,8 @@
     armorNotesEl.innerHTML = '';
 
     const sharedArmorNote = `<div class="note-box">
-      You may not equip any other armor found in-game.<br>
-      The <strong>helm</strong> may be unequipped, or swapped for special items once obtained in-game (Sunlight Maggot, Dusk Crown, Masks, etc).<br>
+      You may not equip any other armor found in your run.<br>
+      The <strong>helm</strong> may be unequipped, or swapped for special items once obtained in your run (Dusk Crown, Masks, etc).<br>
       You may grant yourself the minimum <strong>Endurance</strong> to stay under 100% equip load.
     </div>`;
 
