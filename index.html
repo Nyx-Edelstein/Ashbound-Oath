@@ -876,11 +876,13 @@
     if (currentWeapon === 'Lifehunt Scythe & Bloodshield') {
       document.getElementById('res-shield').textContent = 'Bloodshield (included with weapon)';
       shieldNotesEl.innerHTML = '<div class="note-box">The Bloodshield is part of this weapon\'s set. Shield roll does not apply.</div>';
+      document.getElementById('reroll-shield').style.display = 'none';
       shieldRow.style.display = 'block';
       shieldDivider.style.display = 'block';
     } else if (shieldMode === 'random') {
       document.getElementById('res-shield').textContent = pick(SHIELDS);
       shieldNotesEl.innerHTML = '<div class="note-box">You may only use this shield. You may not equip any other shield found in your run.</div>';
+      document.getElementById('reroll-shield').style.display = '';
       shieldRow.style.display = 'block';
       shieldDivider.style.display = 'block';
     } else if (shieldMode === 'none') {
@@ -894,6 +896,7 @@
       document.getElementById('res-shield').textContent = 'No Shield — ' + style.name;
       shieldNotesEl.innerHTML = '<div class="note-box">You may not equip any shield for the entire run.</div>'
         + `<div class="note-box">Suggestion: ${style.note}</div>`;
+      document.getElementById('reroll-shield').style.display = '';
       shieldRow.style.display = 'block';
       shieldDivider.style.display = 'block';
     } else {
@@ -918,11 +921,13 @@
     if (armorMode === 'random') {
       document.getElementById('res-armor').textContent = pick(ARMOR_SETS);
       armorNotesEl.innerHTML = sharedArmorNote;
+      document.getElementById('reroll-armor').style.display = '';
       armorRow.style.display = 'block';
       armorDivider.style.display = 'block';
     } else if (armorMode === 'choice') {
       document.getElementById('res-armor').textContent = 'Your choice';
       armorNotesEl.innerHTML = sharedArmorNote;
+      document.getElementById('reroll-armor').style.display = 'none';
       armorRow.style.display = 'block';
       armorDivider.style.display = 'block';
     } else {
