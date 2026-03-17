@@ -813,12 +813,14 @@
 
     if (category === 'weapon') {
       if (currentPool.length === 0) return;
+      const prevWasLifehunt = currentWeapon === 'Lifehunt Scythe & Bloodshield';
       const { w, cat } = pick(currentPool);
       currentWeapon = w;
       currentWeaponCat = cat;
       renderWeapon(w, cat);
-      // Re-render shield in case Lifehunt was rolled
-      renderShield();
+      // Only re-render shield if Lifehunt status changed
+      const nowIsLifehunt = w === 'Lifehunt Scythe & Bloodshield';
+      if (prevWasLifehunt !== nowIsLifehunt) renderShield();
     } else if (category === 'secondary') {
       currentSecondary = rollSecondary(currentWeapon);
       renderSecondary(currentSecondary);
