@@ -759,11 +759,12 @@
 
   // Normal weapons minus unsafe picks (greatbows, fist, dagger variants, whips)
   const SAFE_NORMAL_WEAPONS = WEAPONS.normal.filter(w =>
-    !["Whip", "Notched Whip"].includes(w)
+    !["Whip", "Notched Whip", "Four-Pronged Plow", "Guardian Tail"].includes(w)
   );
 
   const UNSAFE_UNIQUE = new Set([
-    "Dragon Bone Fist", "Priscilla's Dagger",
+    "Dragon Bone Fist", "Priscilla's Dagger", "Jagged Ghost Blade",
+    "Channeler's Trident", "Dark Silver Tracer",
     "Dragonslayer Greatbow", "Gough's Greatbow"
   ]);
 
