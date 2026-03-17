@@ -793,8 +793,12 @@
     return pick(filtered);
   }
 
-  function rollSecondary(excludeWeapon) {
-    return pickExcluding(SAFE_NORMAL_WEAPONS, excludeWeapon);
+  function rollSecondary(excludeWeapon, primaryCat) {
+    let pool = [...SAFE_NORMAL_WEAPONS];
+    if (primaryCat !== 'flame' && primaryCat !== 'catalyst' && primaryCat !== 'talisman') {
+      pool = pool.concat(WEAPONS.flame, WEAPONS.catalyst, WEAPONS.talisman);
+    }
+    return pick(pool.filter(x => x !== excludeWeapon));
   }
 
   function updateRerollButton(id, category) {
@@ -822,7 +826,7 @@
       const nowIsLifehunt = w === 'Lifehunt Scythe & Bloodshield';
       if (prevWasLifehunt !== nowIsLifehunt) renderShield();
     } else if (category === 'secondary') {
-      currentSecondary = rollSecondary(currentWeapon);
+      currentSecondary = rollSecondary(currentWeapon, currentWeaponCat);
       renderSecondary(currentSecondary);
     } else if (category === 'shield') {
       renderShield();
@@ -862,8 +866,12 @@
 
   function renderSecondary(weapon) {
     document.getElementById('res-secondary').textContent = weapon;
+    const isCasting = WEAPONS.flame.includes(weapon) || WEAPONS.catalyst.includes(weapon) || WEAPONS.talisman.includes(weapon);
+    const note = isCasting
+      ? 'Backup casting tool. You may start with 30 in your main stat and <strong>one damaging spell</strong> whose stat requirement is <strong>≤ 30</strong>.'
+      : 'Backup weapon. Starts at <strong>+5 or +10</strong> — your discretion.';
     document.getElementById('res-secondary-notes').innerHTML =
-      '<div class="note-box">Backup weapon. Starts at <strong>+5 or +10</strong> — your discretion. You are not required to use both, but this provides some flexibility.</div>';
+      `<div class="note-box">${note} You are not required to use both, but this provides some flexibility.</div>`;
   }
 
   function renderShield() {
@@ -966,7 +974,7 @@
     renderWeapon(weapon, cat);
 
     // Secondary weapon (always safe normal, different from primary)
-    currentSecondary = rollSecondary(weapon);
+    currentSecondary = rollSecondary(weapon, cat);
     renderSecondary(currentSecondary);
 
     // Shield
