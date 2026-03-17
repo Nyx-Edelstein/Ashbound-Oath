@@ -490,7 +490,6 @@
       position: fixed;
       top: 1.5rem;
       right: 1.5rem;
-      text-align: right;
       font-size: 0.72rem;
       letter-spacing: 0.08em;
       color: #6a5a40;
@@ -498,7 +497,20 @@
       z-index: 100;
     }
 
-    .oath-stats .stat-val { color: #e8c870; font-weight: bold; }
+    .oath-stats .stat-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5em;
+    }
+
+    .oath-stats .stat-val {
+      color: #e8c870;
+      font-weight: bold;
+      min-width: 1.6em;
+      text-align: right;
+    }
+
+    .oath-stats .stat-label { color: #6a5a40; }
 
     /* ── Take Oath button ── */
     .btn-take-oath {
@@ -670,8 +682,10 @@
       .checkbox-grid { grid-template-columns: 1fr 1fr; }
       .oath-stats {
         position: static;
-        text-align: center;
         margin-bottom: 1rem;
+      }
+      .oath-stats .stat-row {
+        justify-content: center;
       }
     }
   </style>
@@ -887,11 +901,17 @@
     <div class="skull-taunt" id="preview-skull-taunt"></div>
   </div>
 
+  <!-- Character Name (before seal) -->
+  <div class="char-name-row" id="char-name-row-config">
+    <label for="char-name-config">Character Name</label>
+    <input type="text" class="char-name-input" id="char-name-config" placeholder="Name your champion before sealing…" maxlength="40" oninput="onCharNameConfigChange()">
+  </div>
+
   <button class="btn-generate" id="btn-generate" onclick="generate()">Seal Your Oath</button>
 
   <!-- Result -->
   <div class="panel" id="result">
-    <div class="panel-title">Your Run</div>
+    <div class="panel-title" id="result-title">Your Run</div>
 
     <div class="skull-meter" id="skull-meter">
       <div class="skull-rank">Difficulty</div>
@@ -948,10 +968,6 @@
     <button class="btn-take-oath" id="btn-take-oath" onclick="takeOath()" style="display:none">⚔️ Take This Oath</button>
 
     <div id="oath-actions" style="display:none">
-      <div class="char-name-row">
-        <label for="char-name">Character Name</label>
-        <input type="text" class="char-name-input" id="char-name" placeholder="Enter your character's name…" maxlength="40" oninput="onCharNameChange()">
-      </div>
       <button class="btn-copy-link" id="btn-copy-link" onclick="copyShareLink()">📋 Copy Share Link</button>
       <button class="btn-reset-oath" id="btn-reset-oath" onclick="showResetDialog()">🔥 Abandon Oath</button>
     </div>
@@ -1884,10 +1900,10 @@
     const el = document.getElementById('oath-stats');
     if (stats.completed === 0 && stats.honored === 0 && stats.broken === 0) { el.innerHTML = ''; return; }
     let html = '';
-    if (stats.completed > 0) html += `<div><span class="stat-val">${stats.completed}</span> Oath${stats.completed !== 1 ? 's' : ''} Fulfilled</div>`;
-    if (stats.honored > 0) html += `<div><span class="stat-val">${stats.honored}</span> Oath${stats.honored !== 1 ? 's' : ''} Honored</div>`;
-    if (stats.broken > 0) html += `<div><span class="stat-val">${stats.broken}</span> Oath${stats.broken !== 1 ? 's' : ''} Broken</div>`;
-    if (stats.maxSkulls > 0) html += `<div><span class="stat-val">${'💀'.repeat(Math.min(stats.maxSkulls, 5))}</span> Greatest Trial</div>`;
+    if (stats.completed > 0) html += `<div class="stat-row"><span class="stat-val">${stats.completed}</span><span class="stat-label">Oath${stats.completed !== 1 ? 's' : ''} Fulfilled</span></div>`;
+    if (stats.honored > 0) html += `<div class="stat-row"><span class="stat-val">${stats.honored}</span><span class="stat-label">Oath${stats.honored !== 1 ? 's' : ''} Honored</span></div>`;
+    if (stats.broken > 0) html += `<div class="stat-row"><span class="stat-val">${stats.broken}</span><span class="stat-label">Oath${stats.broken !== 1 ? 's' : ''} Broken</span></div>`;
+    if (stats.maxSkulls > 0) html += `<div class="stat-row"><span class="stat-val">💀x${stats.maxSkulls}</span><span class="stat-label">Greatest Trial</span></div>`;
     el.innerHTML = html;
   }
 
@@ -1895,6 +1911,7 @@
   function encodeState() {
     const shieldMode = document.querySelector('input[name="shield"]:checked').value;
     const armorMode = document.querySelector('input[name="armor"]:checked').value;
+    const stats = loadStats();
     const data = [
       weaponToIndex(currentWeapon),
       currentSecondary ? weaponToIndex(currentSecondary) : -1,
@@ -1905,9 +1922,10 @@
       armorMode === 'random' ? ARMOR_SETS.indexOf(currentArmor) : 0,
       MODIFIERS.reduce((bits, m, i) => bits | (document.getElementById(m.id).checked ? (1 << i) : 0), 0),
       currentOathIndices[0], currentOathIndices[1], currentOathIndices[2],
-      document.getElementById('opt-backup').checked ? 1 : 0
+      document.getElementById('opt-backup').checked ? 1 : 0,
+      characterName || '',
+      stats.completed, stats.honored, stats.broken, stats.maxSkulls
     ];
-    if (characterName) data.push(characterName);
     return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
   }
 
@@ -1923,8 +1941,10 @@
       if (raw && typeof raw === 'object' && !Array.isArray(raw) && raw.p) return raw;
       // New format: array of indices
       if (Array.isArray(raw)) {
-        const [wi, si, hi, shi, hci, ai, ari, mb, oi, bi, ci, bk, ...rest] = raw;
-        const name = rest.length > 0 && typeof rest[0] === 'string' ? rest[0] : '';
+        const [wi, si, hi, shi, hci, ai, ari, mb, oi, bi, ci, bk, nameOrLegacy, ...rest] = raw;
+        const name = typeof nameOrLegacy === 'string' ? nameOrLegacy : '';
+        const sharerStats = rest.length >= 3 ? { completed: rest[0], honored: rest[1], broken: rest[2], maxSkulls: rest[3] || 0 }
+          : (typeof nameOrLegacy === 'number' ? null : null);
         const { name: wn, cat: wc } = indexToWeapon(wi);
         return {
           p: wn, k: wc,
@@ -1936,7 +1956,8 @@
           m: MODIFIERS.map((_, i) => (mb >> i) & 1),
           o: [oi, bi, ci],
           b: bk,
-          n: name
+          n: name,
+          ss: sharerStats
         };
       }
       return null;
@@ -1944,16 +1965,6 @@
   }
 
   function copyShareLink() {
-    if (!characterName) {
-      const nameInput = document.getElementById('char-name');
-      nameInput.focus();
-      nameInput.style.borderColor = '#d06050';
-      setTimeout(() => { nameInput.style.borderColor = ''; }, 2000);
-      const btn = document.getElementById('btn-copy-link');
-      btn.textContent = '↑ Enter a name first';
-      setTimeout(() => { btn.textContent = '📋 Copy Share Link'; }, 2000);
-      return;
-    }
     updateShareHash();
     const url = window.location.href;
     navigator.clipboard.writeText(url).then(() => {
@@ -1963,12 +1974,9 @@
     });
   }
 
-  function onCharNameChange() {
-    characterName = document.getElementById('char-name').value.trim();
-    if (oathTaken) {
-      saveCachedOath();
-      updateShareHash();
-    }
+  function onCharNameConfigChange() {
+    characterName = document.getElementById('char-name-config').value.trim();
+    saveConfig();
   }
 
   // ── Render shield/armor from stored state (no re-roll) ──
@@ -2042,6 +2050,7 @@
     document.getElementById('btn-generate').style.display = 'none';
     document.getElementById('btn-take-oath').style.display = 'none';
     document.getElementById('oath-actions').style.display = 'none';
+    document.getElementById('char-name-row-config').style.display = 'none';
     document.querySelector('details.rules').removeAttribute('open');
 
     // Set radio buttons
@@ -2063,11 +2072,14 @@
     // Render weapon
     renderWeapon(state.p, state.k);
 
-    // Character name
+    // Character name — replace panel title in shared view
     if (characterName) {
-      const nameEl = document.getElementById('char-name-display');
-      nameEl.textContent = characterName + "'s Oath";
-      nameEl.style.display = 'block';
+      document.getElementById('result-title').textContent = characterName + "'s Oath";
+    }
+
+    // Sharer's oath stats
+    if (state.ss && (state.ss.completed > 0 || state.ss.honored > 0 || state.ss.broken > 0)) {
+      renderSharerStats(state.ss, characterName);
     }
 
     // Secondary
@@ -2189,10 +2201,23 @@
     document.querySelectorAll('.reroll-btn').forEach(btn => btn.style.display = 'none');
     document.getElementById('btn-take-oath').style.display = 'none';
     document.getElementById('oath-actions').style.display = 'block';
-    if (characterName) document.getElementById('char-name').value = characterName;
+    document.getElementById('char-name-row-config').style.display = 'none';
     document.querySelector('details.rules').removeAttribute('open');
     document.getElementById('result').style.display = 'block';
     updateShareHash();
+  }
+
+  function renderSharerStats(ss, name) {
+    const label = name ? name + "'s" : "Sharer's";
+    let html = `<div class="skull-rank" style="margin-top:0.8rem">${label} Record</div><div style="text-align:center;font-size:0.82rem;color:#8a7a60">`;
+    const parts = [];
+    if (ss.completed > 0) parts.push(`${ss.completed} Fulfilled`);
+    if (ss.honored > 0) parts.push(`${ss.honored} Honored`);
+    if (ss.broken > 0) parts.push(`${ss.broken} Broken`);
+    if (ss.maxSkulls > 0) parts.push(`\ud83d\udc80x${ss.maxSkulls} Greatest`);
+    html += parts.join(' \u00b7 ') + '</div>';
+    const skullMeter = document.getElementById('skull-meter');
+    skullMeter.insertAdjacentHTML('beforeend', html);
   }
 
   // ── Take Oath ──
@@ -2201,7 +2226,7 @@
     document.querySelectorAll('.reroll-btn').forEach(btn => btn.style.display = 'none');
     document.getElementById('btn-take-oath').style.display = 'none';
     document.getElementById('oath-actions').style.display = 'block';
-    if (characterName) document.getElementById('char-name').value = characterName;
+    document.getElementById('char-name-row-config').style.display = 'none';
     saveCachedOath();
     updateShareHash();
   }
@@ -2297,7 +2322,8 @@
     currentArmor = null;
     oathTaken = false;
     characterName = '';
-    document.getElementById('char-name').value = '';
+    document.getElementById('char-name-config').value = '';
+    document.getElementById('char-name-row-config').style.display = '';
 
     document.getElementById('panel-weapon-pool').style.display = '';
     document.getElementById('panel-shield').style.display = '';
@@ -2311,13 +2337,64 @@
     btn.style.display = '';
 
     document.getElementById('result').style.display = 'none';
+    document.getElementById('char-name-display').style.display = 'none';
     document.body.classList.remove('screen-burn');
     history.replaceState(null, '', window.location.pathname);
+    restoreConfig();
     renderPreviewSkulls();
+  }
+
+  // ── Config persistence ──
+  const CONFIG_CHECKBOXES = ['pool-unique','pool-normal','pool-flame','pool-catalyst','pool-talisman','pool-bow','pool-crossbow','opt-backup'];
+  const CONFIG_MODIFIERS = MODIFIERS.map(m => m.id);
+
+  function saveConfig() {
+    const cfg = {
+      cb: CONFIG_CHECKBOXES.map(id => document.getElementById(id).checked ? 1 : 0),
+      mod: CONFIG_MODIFIERS.map(id => document.getElementById(id).checked ? 1 : 0),
+      shield: document.querySelector('input[name="shield"]:checked').value,
+      armor: document.querySelector('input[name="armor"]:checked').value,
+      name: characterName
+    };
+    localStorage.setItem('ashbound-config', JSON.stringify(cfg));
+  }
+
+  function loadConfig() {
+    try { return JSON.parse(localStorage.getItem('ashbound-config')); }
+    catch { return null; }
+  }
+
+  function restoreConfig() {
+    const cfg = loadConfig();
+    if (!cfg) return;
+    if (cfg.cb) CONFIG_CHECKBOXES.forEach((id, i) => { document.getElementById(id).checked = !!cfg.cb[i]; });
+    if (cfg.mod) CONFIG_MODIFIERS.forEach((id, i) => { document.getElementById(id).checked = !!cfg.mod[i]; });
+    if (cfg.shield) { const r = document.querySelector(`input[name="shield"][value="${cfg.shield}"]`); if (r) r.checked = true; }
+    if (cfg.armor) { const r = document.querySelector(`input[name="armor"][value="${cfg.armor}"]`); if (r) r.checked = true; }
+    if (cfg.name) {
+      characterName = cfg.name;
+      document.getElementById('char-name-config').value = cfg.name;
+    }
+  }
+
+  // Attach auto-save to all config controls
+  function attachConfigSave() {
+    CONFIG_CHECKBOXES.forEach(id => document.getElementById(id).addEventListener('change', saveConfig));
+    document.querySelectorAll('input[name="shield"]').forEach(r => r.addEventListener('change', saveConfig));
+    document.querySelectorAll('input[name="armor"]').forEach(r => r.addEventListener('change', saveConfig));
   }
 
   // ── Generate ──
   function generate() {
+    // Require character name
+    if (!characterName) {
+      const nameInput = document.getElementById('char-name-config');
+      nameInput.focus();
+      nameInput.style.borderColor = '#d06050';
+      setTimeout(() => { nameInput.style.borderColor = ''; }, 2000);
+      return;
+    }
+
     const warn = document.getElementById('warn-empty');
 
     // Build weighted pool
@@ -2394,9 +2471,17 @@
     btn.disabled = true;
     btn.textContent = `${sealEmoji} Oath Sealed ${sealEmoji}`;
 
-    // Show Take Oath button, hide oath actions
+    // Show Take Oath button, hide oath actions and name input
     document.getElementById('btn-take-oath').style.display = 'block';
     document.getElementById('oath-actions').style.display = 'none';
+    document.getElementById('char-name-row-config').style.display = 'none';
+
+    // Show character name display
+    if (characterName) {
+      const nameEl = document.getElementById('char-name-display');
+      nameEl.textContent = characterName + "'s Oath";
+      nameEl.style.display = 'block';
+    }
 
     // Show result with fresh animation
     const resultEl = document.getElementById('result');
@@ -2424,6 +2509,8 @@
       return;
     }
 
+    restoreConfig();
+    attachConfigSave();
     renderPreviewSkulls();
   })();
 </script>
