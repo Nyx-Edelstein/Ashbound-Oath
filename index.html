@@ -485,15 +485,201 @@
       box-shadow: 0 0 14px #c8920022;
     }
 
+    /* ── Oath stats ── */
+    .oath-stats {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      text-align: right;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      color: #6a5a40;
+      line-height: 1.8;
+      z-index: 100;
+    }
+
+    .oath-stats .stat-val { color: #e8c870; font-weight: bold; }
+
+    /* ── Take Oath button ── */
+    .btn-take-oath {
+      display: block;
+      width: 100%;
+      padding: 0.95rem 1rem;
+      background: #1e1810;
+      border: 1px solid #b08020;
+      color: #e8c870;
+      font-family: inherit;
+      font-size: 1rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 3px;
+      margin-top: 1.2rem;
+      transition: background 0.18s, box-shadow 0.18s, border-color 0.18s;
+    }
+
+    .btn-take-oath:hover {
+      background: #2c2214;
+      border-color: #e8c870;
+      box-shadow: 0 0 14px #c8920022;
+    }
+
+    /* ── Reset Oath button ── */
+    .btn-reset-oath {
+      display: block;
+      width: 100%;
+      padding: 0.7rem 1rem;
+      background: #1c0e0e;
+      border: 1px solid #5a2424;
+      color: #d06050;
+      font-family: inherit;
+      font-size: 0.82rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 3px;
+      margin-top: 0.6rem;
+      transition: background 0.12s, border-color 0.12s;
+    }
+
+    .btn-reset-oath:hover {
+      background: #2a1010;
+      border-color: #a03030;
+    }
+
+    /* ── Character name ── */
+    .char-name-row {
+      margin-top: 1rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .char-name-row label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #6a5a40;
+      margin-bottom: 0.35rem;
+    }
+
+    .char-name-input {
+      width: 100%;
+      padding: 0.55rem 0.8rem;
+      background: #0e0d0b;
+      border: 1px solid #3a2e18;
+      border-radius: 3px;
+      color: #e8c870;
+      font-family: inherit;
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .char-name-input:focus { border-color: #b08020; }
+    .char-name-input::placeholder { color: #4a3e28; }
+
+    .char-name-display {
+      text-align: center;
+      font-size: 1.1rem;
+      color: #e8c870;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.3rem;
+    }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 10000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: #161309;
+      border: 1px solid #3a2e18;
+      border-radius: 5px;
+      padding: 1.8rem 2rem;
+      max-width: 480px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      color: #e8c870;
+      letter-spacing: 0.08em;
+      margin-bottom: 1rem;
+    }
+
+    .modal-text {
+      font-size: 0.92rem;
+      color: #b0a080;
+      line-height: 1.7;
+      margin-bottom: 1.4rem;
+      font-style: italic;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 0.8rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .modal-btn {
+      padding: 0.6rem 1.4rem;
+      font-family: inherit;
+      font-size: 0.88rem;
+      letter-spacing: 0.1em;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+    }
+
+    .modal-btn-yes {
+      background: #1e1810;
+      border: 1px solid #b08020;
+      color: #e8c870;
+    }
+
+    .modal-btn-yes:hover {
+      background: #2c2214;
+      border-color: #e8c870;
+    }
+
+    .modal-btn-no {
+      background: #161309;
+      border: 1px solid #3a2e18;
+      color: #b09060;
+    }
+
+    .modal-btn-no:hover {
+      background: #201a0e;
+      border-color: #b08020;
+    }
+
     /* ── Responsive ── */
     @media (max-width: 480px) {
       h1 { font-size: 1.5rem; }
       .checkbox-grid { grid-template-columns: 1fr 1fr; }
+      .oath-stats {
+        position: static;
+        text-align: center;
+        margin-bottom: 1rem;
+      }
     }
   </style>
 </head>
 <body>
 <div class="container">
+
+  <div class="oath-stats" id="oath-stats"></div>
 
   <header>
     <h1>Ashbound Oath
@@ -717,6 +903,8 @@
 
     <div class="oath-text" id="oath-text"></div>
 
+    <div class="char-name-display" id="char-name-display" style="display:none"></div>
+
     <div class="result-row">
       <div class="res-label">Primary Weapon
         <button class="reroll-btn" id="reroll-weapon" onclick="reroll('weapon')" title="Reroll primary weapon (2 rerolls remaining)">🎲 2</button>
@@ -757,11 +945,29 @@
       <div id="res-armor-notes"></div>
     </div>
 
-    <button class="btn-copy-link" id="btn-copy-link" onclick="copyShareLink()">📋 Copy Share Link</button>
+    <button class="btn-take-oath" id="btn-take-oath" onclick="takeOath()" style="display:none">⚔️ Take This Oath</button>
+
+    <div id="oath-actions" style="display:none">
+      <div class="char-name-row">
+        <label for="char-name">Character Name</label>
+        <input type="text" class="char-name-input" id="char-name" placeholder="Enter your character's name…" maxlength="40" oninput="onCharNameChange()">
+      </div>
+      <button class="btn-copy-link" id="btn-copy-link" onclick="copyShareLink()">📋 Copy Share Link</button>
+      <button class="btn-reset-oath" id="btn-reset-oath" onclick="showResetDialog()">🔥 Abandon Oath</button>
+    </div>
   </div>
 
 
 </div><!-- /.container -->
+
+<!-- Reset Oath Modal -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-text" id="modal-text"></div>
+    <div class="modal-buttons" id="modal-buttons"></div>
+  </div>
+</div>
 
 <script>
   const WEAPONS = {
@@ -1094,6 +1300,26 @@
   WEAPONS.catalyst.forEach(w => { WEAPON_ARMOR_MAP[w] = ["sorcery"]; });
   WEAPONS.talisman.forEach(w => { WEAPON_ARMOR_MAP[w] = ["holy"]; });
 
+  // ── Flat weapon index for compact encoding ──
+  const ALL_WEAPONS_FLAT = [];
+  const WEAPON_CAT_BOUNDARIES = [];
+  ['unique','normal','bow','crossbow','flame','catalyst','talisman'].forEach(cat => {
+    WEAPON_CAT_BOUNDARIES.push({ cat, start: ALL_WEAPONS_FLAT.length });
+    WEAPONS[cat].forEach(w => ALL_WEAPONS_FLAT.push(w));
+  });
+  const SHIELD_MODES = ['random', 'none-physical', 'none-caster', 'free'];
+  const ARMOR_MODES = ['random', 'choice', 'none'];
+
+  function weaponToIndex(name) { return ALL_WEAPONS_FLAT.indexOf(name); }
+  function indexToWeapon(idx) {
+    const name = ALL_WEAPONS_FLAT[idx];
+    let cat = 'unique';
+    for (let i = WEAPON_CAT_BOUNDARIES.length - 1; i >= 0; i--) {
+      if (idx >= WEAPON_CAT_BOUNDARIES[i].start) { cat = WEAPON_CAT_BOUNDARIES[i].cat; break; }
+    }
+    return { name, cat };
+  }
+
   function getThematicArmor(weapon) {
     const groups = WEAPON_ARMOR_MAP[weapon];
     if (!groups) return ARMOR_SETS;
@@ -1183,8 +1409,8 @@
   ];
 
   const OATH_CLOSINGS = [
-    "May the Lords bear witness to your oath.",
-    "Let ash mark your path to Anor Londo.",
+    "May all bear witness to your oath.",
+    "Let ash mark your path to honor.",
     "Walk the path of cinder, or be consumed.",
     "Neither death nor hollowing shall release you.",
     "Your oath is sealed — there is no turning back.",
@@ -1251,6 +1477,8 @@
   let currentShieldStyle = null;
   let currentArmor = null;
   let currentPool = [];
+  let characterName = '';
+  let oathTaken = false;
   const rerollsLeft = { weapon: 2, secondary: 2, shield: 2, armor: 2 };
 
   function pick(arr) {
@@ -1321,7 +1549,6 @@
     }
 
     updateRerollButton('reroll-' + category, category);
-    updateShareHash();
   }
 
   function renderWeapon(weapon, cat) {
@@ -1483,10 +1710,8 @@
   }
 
   function onModifierToggle() {
-    // Update preview if pre-roll, update post-roll if sealed
     if (currentWeapon) {
       renderSkulls();
-      updateShareHash();
     } else {
       renderPreviewSkulls();
     }
@@ -1624,26 +1849,66 @@
       + (total < 4 ? ' — It is no true Oath unless you bear 4 or more skulls.' : '');
   }
 
-  // ── Seed encoding / decoding ──
-  function encodeState() {
-    const state = {
-      p: currentWeapon,
-      k: currentWeaponCat,
-      s: currentSecondary,
-      h: document.querySelector('input[name="shield"]:checked').value,
-      hv: document.getElementById('res-shield').textContent,
-      hn: document.getElementById('res-shield-notes').innerHTML,
-      a: document.querySelector('input[name="armor"]:checked').value,
-      av: document.getElementById('res-armor').textContent,
-      an: document.getElementById('res-armor-notes').innerHTML,
-      m: MODIFIERS.map(m => document.getElementById(m.id).checked ? 1 : 0),
-      r: [rerollsLeft.weapon, rerollsLeft.secondary, rerollsLeft.shield, rerollsLeft.armor],
+  // ── localStorage ──
+  function loadStats() {
+    try { return JSON.parse(localStorage.getItem('ashbound-stats')) || { completed: 0, honored: 0, broken: 0, maxSkulls: 0 }; }
+    catch { return { completed: 0, honored: 0, broken: 0, maxSkulls: 0 }; }
+  }
+  function saveStats(stats) { localStorage.setItem('ashbound-stats', JSON.stringify(stats)); }
+  function loadCachedOath() {
+    try { return JSON.parse(localStorage.getItem('ashbound-oath')); }
+    catch { return null; }
+  }
+  function saveCachedOath() {
+    const shieldMode = document.querySelector('input[name="shield"]:checked').value;
+    const armorMode = document.querySelector('input[name="armor"]:checked').value;
+    const data = {
+      w: weaponToIndex(currentWeapon),
+      s: currentSecondary ? weaponToIndex(currentSecondary) : -1,
+      h: SHIELD_MODES.indexOf(shieldMode),
+      shi: currentShield ? SHIELDS.indexOf(currentShield) : 0,
+      hci: currentShieldStyle ? Math.max(0, CASTER_OFFHAND_SUGGESTIONS.findIndex(s => s.name === currentShieldStyle)) : 0,
+      a: ARMOR_MODES.indexOf(armorMode),
+      ari: currentArmor ? ARMOR_SETS.indexOf(currentArmor) : 0,
+      mb: MODIFIERS.reduce((bits, m, i) => bits | (document.getElementById(m.id).checked ? (1 << i) : 0), 0),
       o: currentOathIndices,
-      st: document.getElementById('skull-title').textContent,
-      sn: document.getElementById('skull-taunt').textContent,
-      b: document.getElementById('opt-backup').checked ? 1 : 0
+      b: document.getElementById('opt-backup').checked ? 1 : 0,
+      n: characterName
     };
-    return btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+    localStorage.setItem('ashbound-oath', JSON.stringify(data));
+  }
+  function clearCachedOath() { localStorage.removeItem('ashbound-oath'); }
+
+  function renderOathStats() {
+    const stats = loadStats();
+    const el = document.getElementById('oath-stats');
+    if (stats.completed === 0 && stats.honored === 0 && stats.broken === 0) { el.innerHTML = ''; return; }
+    let html = '';
+    if (stats.completed > 0) html += `<div><span class="stat-val">${stats.completed}</span> Oath${stats.completed !== 1 ? 's' : ''} Fulfilled</div>`;
+    if (stats.honored > 0) html += `<div><span class="stat-val">${stats.honored}</span> Oath${stats.honored !== 1 ? 's' : ''} Honored</div>`;
+    if (stats.broken > 0) html += `<div><span class="stat-val">${stats.broken}</span> Oath${stats.broken !== 1 ? 's' : ''} Broken</div>`;
+    if (stats.maxSkulls > 0) html += `<div><span class="stat-val">${'💀'.repeat(Math.min(stats.maxSkulls, 5))}</span> Greatest Trial</div>`;
+    el.innerHTML = html;
+  }
+
+  // ── Compact seed encoding / decoding ──
+  function encodeState() {
+    const shieldMode = document.querySelector('input[name="shield"]:checked').value;
+    const armorMode = document.querySelector('input[name="armor"]:checked').value;
+    const data = [
+      weaponToIndex(currentWeapon),
+      currentSecondary ? weaponToIndex(currentSecondary) : -1,
+      SHIELD_MODES.indexOf(shieldMode),
+      shieldMode === 'random' ? SHIELDS.indexOf(currentShield) : 0,
+      shieldMode === 'none-caster' ? Math.max(0, CASTER_OFFHAND_SUGGESTIONS.findIndex(s => s.name === currentShieldStyle)) : 0,
+      ARMOR_MODES.indexOf(armorMode),
+      armorMode === 'random' ? ARMOR_SETS.indexOf(currentArmor) : 0,
+      MODIFIERS.reduce((bits, m, i) => bits | (document.getElementById(m.id).checked ? (1 << i) : 0), 0),
+      currentOathIndices[0], currentOathIndices[1], currentOathIndices[2],
+      document.getElementById('opt-backup').checked ? 1 : 0
+    ];
+    if (characterName) data.push(characterName);
+    return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
   }
 
   function updateShareHash() {
@@ -1653,11 +1918,43 @@
 
   function decodeState(hash) {
     try {
-      return JSON.parse(decodeURIComponent(escape(atob(hash))));
+      const raw = JSON.parse(decodeURIComponent(escape(atob(hash))));
+      // Old format: object with 'p' property
+      if (raw && typeof raw === 'object' && !Array.isArray(raw) && raw.p) return raw;
+      // New format: array of indices
+      if (Array.isArray(raw)) {
+        const [wi, si, hi, shi, hci, ai, ari, mb, oi, bi, ci, bk, ...rest] = raw;
+        const name = rest.length > 0 && typeof rest[0] === 'string' ? rest[0] : '';
+        const { name: wn, cat: wc } = indexToWeapon(wi);
+        return {
+          p: wn, k: wc,
+          s: si >= 0 ? ALL_WEAPONS_FLAT[si] : null,
+          h: SHIELD_MODES[hi] || 'free',
+          shi: shi, hci: hci,
+          a: ARMOR_MODES[ai] || 'none',
+          ari: ari,
+          m: MODIFIERS.map((_, i) => (mb >> i) & 1),
+          o: [oi, bi, ci],
+          b: bk,
+          n: name
+        };
+      }
+      return null;
     } catch { return null; }
   }
 
   function copyShareLink() {
+    if (!characterName) {
+      const nameInput = document.getElementById('char-name');
+      nameInput.focus();
+      nameInput.style.borderColor = '#d06050';
+      setTimeout(() => { nameInput.style.borderColor = ''; }, 2000);
+      const btn = document.getElementById('btn-copy-link');
+      btn.textContent = '↑ Enter a name first';
+      setTimeout(() => { btn.textContent = '📋 Copy Share Link'; }, 2000);
+      return;
+    }
+    updateShareHash();
     const url = window.location.href;
     navigator.clipboard.writeText(url).then(() => {
       const btn = document.getElementById('btn-copy-link');
@@ -1666,7 +1963,75 @@
     });
   }
 
+  function onCharNameChange() {
+    characterName = document.getElementById('char-name').value.trim();
+    if (oathTaken) {
+      saveCachedOath();
+      updateShareHash();
+    }
+  }
+
+  // ── Render shield/armor from stored state (no re-roll) ──
+  function renderShieldFromState(shieldMode) {
+    const shieldRow = document.getElementById('shield-row');
+    const shieldDivider = document.getElementById('shield-divider');
+    const shieldNotesEl = document.getElementById('res-shield-notes');
+    shieldNotesEl.innerHTML = '';
+
+    if (currentWeapon === 'Lifehunt Scythe & Bloodshield') {
+      document.getElementById('res-shield').textContent = 'Bloodshield (included with weapon)';
+      shieldNotesEl.innerHTML = '<div class="note-box">The Bloodshield is part of this weapon\'s set.</div>';
+      shieldRow.style.display = 'block';
+      shieldDivider.style.display = 'block';
+    } else if (shieldMode === 'random' && currentShield) {
+      document.getElementById('res-shield').textContent = currentShield;
+      shieldNotesEl.innerHTML = '<div class="note-box">You may only use this shield. You may not equip any other shield found in your run.</div>';
+      shieldRow.style.display = 'block';
+      shieldDivider.style.display = 'block';
+    } else if (shieldMode === 'none-physical') {
+      document.getElementById('res-shield').textContent = 'No Shield — Two-Hand or Dual Wield';
+      shieldNotesEl.innerHTML = '<div class="note-box">You may not equip any shield for the entire run.</div><div class="note-box">Two-hand your weapon or use any off-hand weapon you scavenge during your run.</div>';
+      shieldRow.style.display = 'block';
+      shieldDivider.style.display = 'block';
+    } else if (shieldMode === 'none-caster' && currentShieldStyle) {
+      const style = CASTER_OFFHAND_SUGGESTIONS.find(s => s.name === currentShieldStyle) || CASTER_OFFHAND_SUGGESTIONS[0];
+      document.getElementById('res-shield').textContent = 'No Shield — ' + style.name;
+      shieldNotesEl.innerHTML = '<div class="note-box">You may not equip any shield for the entire run.</div><div class="note-box">Suggestion: ' + style.note + '</div>';
+      shieldRow.style.display = 'block';
+      shieldDivider.style.display = 'block';
+    } else {
+      shieldRow.style.display = 'none';
+      shieldDivider.style.display = 'none';
+    }
+  }
+
+  function renderArmorFromState(armorMode) {
+    const armorRow = document.getElementById('armor-row');
+    const armorDivider = document.getElementById('armor-divider');
+    const armorNotesEl = document.getElementById('res-armor-notes');
+    armorNotesEl.innerHTML = '';
+    const sharedArmorNote = `<div class="note-box">You may not equip any other armor found in your run.<br>The <strong>helm</strong> may be unequipped, or swapped for special items once obtained in your run (Dusk Crown, Masks, etc).<br>You may grant yourself the minimum <strong>Endurance</strong> to stay under 100% equip load.</div>`;
+
+    if (armorMode === 'random' && currentArmor) {
+      document.getElementById('res-armor').textContent = currentArmor;
+      armorNotesEl.innerHTML = sharedArmorNote;
+      armorRow.style.display = 'block';
+      armorDivider.style.display = 'block';
+    } else if (armorMode === 'choice') {
+      document.getElementById('res-armor').textContent = 'Your choice';
+      armorNotesEl.innerHTML = sharedArmorNote;
+      armorRow.style.display = 'block';
+      armorDivider.style.display = 'block';
+    } else {
+      armorRow.style.display = 'none';
+      armorDivider.style.display = 'none';
+    }
+  }
+
+  // ── Shared view rendering ──
   function renderFromSeed(state) {
+    const isOldFormat = !!state.hv;
+
     // Hide config panels
     document.getElementById('panel-weapon-pool').style.display = 'none';
     document.getElementById('panel-shield').style.display = 'none';
@@ -1675,26 +2040,35 @@
     document.getElementById('skull-preview').style.display = 'none';
     document.getElementById('warn-empty').style.display = 'none';
     document.getElementById('btn-generate').style.display = 'none';
-
-    // Collapse rules reference in shared view
+    document.getElementById('btn-take-oath').style.display = 'none';
+    document.getElementById('oath-actions').style.display = 'none';
     document.querySelector('details.rules').removeAttribute('open');
 
-    // Set radio buttons so renderShield/renderArmor logic works
-    document.querySelector(`input[name="shield"][value="${state.h}"]`).checked = true;
+    // Set radio buttons
+    let shieldVal = state.h;
+    if (shieldVal === 'none') shieldVal = 'none-physical'; // backward compat
+    const shieldRadio = document.querySelector(`input[name="shield"][value="${shieldVal}"]`);
+    if (shieldRadio) shieldRadio.checked = true;
     document.querySelector(`input[name="armor"][value="${state.a}"]`).checked = true;
-
-    // Restore modifier and backup state
     MODIFIERS.forEach((m, i) => { document.getElementById(m.id).checked = !!state.m[i]; });
     document.getElementById('opt-backup').checked = !!state.b;
 
-    // Restore weapon state
+    // Restore state
     currentWeapon = state.p;
     currentWeaponCat = state.k;
     currentSecondary = state.s;
     currentOathIndices = state.o;
+    characterName = state.n || '';
 
-    // Render everything
+    // Render weapon
     renderWeapon(state.p, state.k);
+
+    // Character name
+    if (characterName) {
+      const nameEl = document.getElementById('char-name-display');
+      nameEl.textContent = characterName + "'s Oath";
+      nameEl.style.display = 'block';
+    }
 
     // Secondary
     const secondaryRow = document.getElementById('secondary-row');
@@ -1709,62 +2083,240 @@
     }
 
     // Shield
-    const shieldRow = document.getElementById('shield-row');
-    const shieldDivider = document.getElementById('shield-divider');
-    if (state.h === 'free' && state.p !== 'Lifehunt Scythe & Bloodshield') {
-      shieldRow.style.display = 'none';
-      shieldDivider.style.display = 'none';
+    if (isOldFormat) {
+      const shieldRow = document.getElementById('shield-row');
+      const shieldDivider = document.getElementById('shield-divider');
+      if (state.h === 'free' && state.p !== 'Lifehunt Scythe & Bloodshield') {
+        shieldRow.style.display = 'none';
+        shieldDivider.style.display = 'none';
+      } else {
+        document.getElementById('res-shield').textContent = state.hv;
+        document.getElementById('res-shield-notes').innerHTML = state.hn;
+        shieldRow.style.display = 'block';
+        shieldDivider.style.display = 'block';
+      }
     } else {
-      document.getElementById('res-shield').textContent = state.hv;
-      document.getElementById('res-shield-notes').innerHTML = state.hn;
-      document.getElementById('reroll-shield').style.display = 'none';
-      shieldRow.style.display = 'block';
-      shieldDivider.style.display = 'block';
+      if (state.h === 'random') currentShield = SHIELDS[state.shi] || SHIELDS[0];
+      if (state.h === 'none-caster') currentShieldStyle = (CASTER_OFFHAND_SUGGESTIONS[state.hci] || CASTER_OFFHAND_SUGGESTIONS[0]).name;
+      renderShieldFromState(shieldVal);
     }
 
     // Armor
-    const armorRow = document.getElementById('armor-row');
-    const armorDivider = document.getElementById('armor-divider');
-    if (state.a === 'none') {
-      armorRow.style.display = 'none';
-      armorDivider.style.display = 'none';
+    if (isOldFormat) {
+      const armorRow = document.getElementById('armor-row');
+      const armorDivider = document.getElementById('armor-divider');
+      if (state.a === 'none') {
+        armorRow.style.display = 'none';
+        armorDivider.style.display = 'none';
+      } else {
+        document.getElementById('res-armor').textContent = state.av;
+        document.getElementById('res-armor-notes').innerHTML = state.an;
+        armorRow.style.display = 'block';
+        armorDivider.style.display = 'block';
+      }
     } else {
-      document.getElementById('res-armor').textContent = state.av;
-      document.getElementById('res-armor-notes').innerHTML = state.an;
-      document.getElementById('reroll-armor').style.display = 'none';
-      armorRow.style.display = 'block';
-      armorDivider.style.display = 'block';
+      if (state.a === 'random') currentArmor = ARMOR_SETS[state.ari] || ARMOR_SETS[0];
+      renderArmorFromState(state.a);
     }
 
-    // Oath text
+    // Oath text & skulls
     renderOathText(state.p);
-
-    // Skulls
     renderSkulls();
-    // Restore saved rank/taunt if present
-    if (state.st) document.getElementById('skull-title').textContent = state.st;
-    if (state.sn) document.getElementById('skull-taunt').textContent = state.sn;
+    if (isOldFormat) {
+      if (state.st) document.getElementById('skull-title').textContent = state.st;
+      if (state.sn) document.getElementById('skull-taunt').textContent = state.sn;
+    }
 
-    // Hide reroll buttons in shared view
+    // Hide reroll buttons
     document.querySelectorAll('.reroll-btn').forEach(btn => btn.style.display = 'none');
 
-    // Make modifier checkboxes read-only in shared view
-    document.querySelectorAll('#modifier-row input[type="checkbox"]').forEach(cb => { cb.disabled = true; });
-
-    // Hide copy link button, show randomizer button
-    document.getElementById('btn-copy-link').style.display = 'none';
-
-    // Add "Go to Randomizer" button
+    // Add "Create Your Own Oath" button
     const randBtn = document.createElement('button');
     randBtn.className = 'btn-randomizer';
     randBtn.textContent = 'Create Your Own Oath';
     randBtn.onclick = () => { window.location.href = window.location.pathname; };
     document.getElementById('result').appendChild(randBtn);
 
-    // Show result
     document.getElementById('result').style.display = 'block';
   }
 
+  // ── Restore cached oath from localStorage ──
+  function restoreCachedOath(data) {
+    const { name: wn, cat: wc } = indexToWeapon(data.w);
+    currentWeapon = wn;
+    currentWeaponCat = wc;
+    currentSecondary = data.s >= 0 ? ALL_WEAPONS_FLAT[data.s] : null;
+    const shieldMode = SHIELD_MODES[data.h];
+    if (shieldMode === 'random') currentShield = SHIELDS[data.shi];
+    if (shieldMode === 'none-caster') currentShieldStyle = (CASTER_OFFHAND_SUGGESTIONS[data.hci] || CASTER_OFFHAND_SUGGESTIONS[0]).name;
+    const armorMode = ARMOR_MODES[data.a];
+    if (armorMode === 'random') currentArmor = ARMOR_SETS[data.ari];
+    currentOathIndices = data.o;
+    characterName = data.n || '';
+    oathTaken = true;
+
+    // Set radio buttons & checkboxes
+    document.querySelector(`input[name="shield"][value="${shieldMode}"]`).checked = true;
+    document.querySelector(`input[name="armor"][value="${armorMode}"]`).checked = true;
+    MODIFIERS.forEach((m, i) => { document.getElementById(m.id).checked = !!((data.mb >> i) & 1); });
+    document.getElementById('opt-backup').checked = !!data.b;
+
+    // Render
+    renderWeapon(wn, wc);
+    const secondaryRow = document.getElementById('secondary-row');
+    const secondaryDivider = document.getElementById('secondary-divider');
+    if (data.b && currentSecondary) {
+      renderSecondary(currentSecondary);
+      secondaryRow.style.display = 'block';
+      secondaryDivider.style.display = 'block';
+    } else {
+      secondaryRow.style.display = 'none';
+      secondaryDivider.style.display = 'none';
+    }
+    renderShieldFromState(shieldMode);
+    renderArmorFromState(armorMode);
+    renderOathText(wn);
+    renderSkulls();
+
+    // Hide config, show taken oath view
+    document.getElementById('panel-weapon-pool').style.display = 'none';
+    document.getElementById('panel-shield').style.display = 'none';
+    document.getElementById('panel-armor').style.display = 'none';
+    document.getElementById('panel-modifiers').style.display = 'none';
+    document.getElementById('skull-preview').style.display = 'none';
+    document.getElementById('warn-empty').style.display = 'none';
+    document.getElementById('btn-generate').style.display = 'none';
+    document.querySelectorAll('.reroll-btn').forEach(btn => btn.style.display = 'none');
+    document.getElementById('btn-take-oath').style.display = 'none';
+    document.getElementById('oath-actions').style.display = 'block';
+    if (characterName) document.getElementById('char-name').value = characterName;
+    document.querySelector('details.rules').removeAttribute('open');
+    document.getElementById('result').style.display = 'block';
+    updateShareHash();
+  }
+
+  // ── Take Oath ──
+  function takeOath() {
+    oathTaken = true;
+    document.querySelectorAll('.reroll-btn').forEach(btn => btn.style.display = 'none');
+    document.getElementById('btn-take-oath').style.display = 'none';
+    document.getElementById('oath-actions').style.display = 'block';
+    if (characterName) document.getElementById('char-name').value = characterName;
+    saveCachedOath();
+    updateShareHash();
+  }
+
+  // ── Reset Oath dialog chain ──
+  function showModal(title, text, yesLabel, noLabel, onYes, onNo) {
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-text').textContent = text;
+    const btns = document.getElementById('modal-buttons');
+    btns.innerHTML = '';
+    const yesBtn = document.createElement('button');
+    yesBtn.className = 'modal-btn modal-btn-yes';
+    yesBtn.textContent = yesLabel;
+    yesBtn.onclick = onYes;
+    const noBtn = document.createElement('button');
+    noBtn.className = 'modal-btn modal-btn-no';
+    noBtn.textContent = noLabel;
+    noBtn.onclick = onNo;
+    btns.appendChild(yesBtn);
+    btns.appendChild(noBtn);
+    document.getElementById('modal-overlay').classList.add('active');
+  }
+
+  function hideModal() {
+    document.getElementById('modal-overlay').classList.remove('active');
+  }
+
+  function showResetDialog() {
+    showModal(
+      'Oath Fulfilled?',
+      'Have you slain Ornstein & Smough and fulfilled every term of your oath? The fire remembers, even if you do not.',
+      'Yes — I have triumphed',
+      'No…',
+      () => {
+        const stats = loadStats();
+        stats.completed++;
+        const skulls = calculateSkulls();
+        if (skulls > stats.maxSkulls) stats.maxSkulls = skulls;
+        saveStats(stats);
+        clearCachedOath();
+        hideModal();
+        renderOathStats();
+        returnToConfig();
+      },
+      () => {
+        hideModal();
+        showModal(
+          'Oath Honored?',
+          'Did you at least kindle a flame beyond Firelink? Did you raise your weapon against the dark, however briefly? The fire does not forget those who tried.',
+          'Yes — I walked the path',
+          'No…',
+          () => {
+            const stats = loadStats();
+            stats.honored++;
+            saveStats(stats);
+            clearCachedOath();
+            hideModal();
+            renderOathStats();
+            returnToConfig();
+          },
+          () => {
+            hideModal();
+            showModal(
+              'Oathbreaker',
+              'Then you are a filthy, wretched, cowardly, maidenless oathbreaker. Do you accept this shame?',
+              'Yes… I am hollow',
+              'No — I will try again',
+              () => {
+                const stats = loadStats();
+                stats.broken++;
+                saveStats(stats);
+                clearCachedOath();
+                hideModal();
+                renderOathStats();
+                returnToConfig();
+              },
+              () => {
+                hideModal();
+              }
+            );
+          }
+        );
+      }
+    );
+  }
+
+  function returnToConfig() {
+    currentWeapon = null;
+    currentWeaponCat = null;
+    currentSecondary = null;
+    currentShield = null;
+    currentShieldStyle = null;
+    currentArmor = null;
+    oathTaken = false;
+    characterName = '';
+    document.getElementById('char-name').value = '';
+
+    document.getElementById('panel-weapon-pool').style.display = '';
+    document.getElementById('panel-shield').style.display = '';
+    document.getElementById('panel-armor').style.display = '';
+    document.getElementById('panel-modifiers').style.display = '';
+    document.getElementById('skull-preview').style.display = '';
+
+    const btn = document.getElementById('btn-generate');
+    btn.disabled = false;
+    btn.textContent = 'Seal Your Oath';
+    btn.style.display = '';
+
+    document.getElementById('result').style.display = 'none';
+    document.body.classList.remove('screen-burn');
+    history.replaceState(null, '', window.location.pathname);
+    renderPreviewSkulls();
+  }
+
+  // ── Generate ──
   function generate() {
     const warn = document.getElementById('warn-empty');
 
@@ -1828,12 +2380,13 @@
     rerollsLeft.armor = 2;
     ['weapon', 'secondary', 'shield', 'armor'].forEach(c => updateRerollButton('reroll-' + c, c));
 
-    // Hide option panels and button
+    // Hide option panels
     document.getElementById('panel-weapon-pool').style.display = 'none';
     document.getElementById('panel-shield').style.display = 'none';
     document.getElementById('panel-armor').style.display = 'none';
     document.getElementById('skull-preview').style.display = 'none';
     document.getElementById('warn-empty').style.display = 'none';
+
     // Disable and restyle the generate button
     const sealEmojis = ['⚔️', '🔥', '⛓️', '💀', '🗡️', '☠️'];
     const sealEmoji = pick(sealEmojis);
@@ -1841,19 +2394,21 @@
     btn.disabled = true;
     btn.textContent = `${sealEmoji} Oath Sealed ${sealEmoji}`;
 
+    // Show Take Oath button, hide oath actions
+    document.getElementById('btn-take-oath').style.display = 'block';
+    document.getElementById('oath-actions').style.display = 'none';
+
     // Show result with fresh animation
     const resultEl = document.getElementById('result');
     resultEl.style.display = 'none';
-    // Force reflow so the animation re-triggers
     void resultEl.offsetHeight;
     resultEl.style.display = 'block';
-
-    // Update share URL
-    updateShareHash();
   }
 
-  // ── Page load: check for seed in URL hash ──
+  // ── Page load ──
   (function() {
+    renderOathStats();
+
     const hash = window.location.hash.slice(1);
     if (hash) {
       const state = decodeState(hash);
@@ -1862,6 +2417,13 @@
         return;
       }
     }
+
+    const cached = loadCachedOath();
+    if (cached && cached.w != null) {
+      restoreCachedOath(cached);
+      return;
+    }
+
     renderPreviewSkulls();
   })();
 </script>
