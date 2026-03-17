@@ -390,36 +390,39 @@
     }
 
     .skull-taunt {
-      font-size: 0.82rem;
-      color: #6a5a40;
+      font-size: 1.42rem;
+      color: #bf9b62;
       font-style: italic;
       margin-top: 0.4rem;
     }
 
-    /* ── Screen burn effect ── */
+    /* ── Screen burn effect — left & right flames ── */
+    .screen-burn::before,
     .screen-burn::after {
       content: '';
       position: fixed;
-      inset: 0;
+      top: 0;
+      bottom: 0;
+      width: 120px;
       pointer-events: none;
       z-index: 9999;
-      box-shadow: inset 0 0 120px 40px #a0300080, inset 0 0 200px 80px #c8480040;
       animation: burnPulse 3s ease-in-out infinite alternate;
     }
 
+    .screen-burn::before {
+      left: 0;
+      background: linear-gradient(to right, #a0300060 0%, #c8480030 40%, transparent 100%);
+    }
+
+    .screen-burn::after {
+      right: 0;
+      background: linear-gradient(to left, #a0300060 0%, #c8480030 40%, transparent 100%);
+    }
+
     @keyframes burnPulse {
-      from { opacity: 0.6; }
-      to   { opacity: 1; }
+      from { opacity: 0.5; }
+      to   { opacity: 0.9; }
     }
-
-    /* ── Starting class ── */
-    .class-rec {
-      font-size: 0.85rem;
-      color: #8a7a60;
-      margin-top: 0.3rem;
-    }
-
-    .class-rec strong { color: #c9b99a; }
 
     /* ── Modifier panel ── */
     .modifier-grid {
@@ -601,6 +604,11 @@
         Crossbows
       </label>
     </div>
+    <hr class="divider" style="margin:0.8rem 0">
+    <label class="check-label">
+      <input type="checkbox" id="opt-backup" checked onchange="renderPreviewSkulls()">
+      Backup Weapon <span class="modifier-skulls">+1 💀 if disabled</span>
+    </label>
   </div>
 
   <!-- Shield -->
@@ -608,20 +616,20 @@
     <div class="panel-title">Shield</div>
     <div class="radio-group">
       <label class="radio-label">
-        <input type="radio" name="shield" value="random">
-        <span>Random Shield
+        <input type="radio" name="shield" value="random" onchange="renderPreviewSkulls()">
+        <span>Random Shield <span class="modifier-skulls">+1 💀</span>
           <span class="sublabel">A shield is randomly selected — you may only use this one.</span>
         </span>
       </label>
       <label class="radio-label">
-        <input type="radio" name="shield" value="none">
-        <span>No Shield
+        <input type="radio" name="shield" value="none" onchange="renderPreviewSkulls()">
+        <span>No Shield <span class="modifier-skulls">+3 💀</span>
           <span class="sublabel">You may not equip any shield for the entire run.</span>
         </span>
       </label>
       <label class="radio-label">
-        <input type="radio" name="shield" value="free" checked>
-        <span>No Restrictions
+        <input type="radio" name="shield" value="free" checked onchange="renderPreviewSkulls()">
+        <span>No Restrictions <span class="modifier-skulls">−2 💀</span>
           <span class="sublabel">Equip any shield freely.</span>
         </span>
       </label>
@@ -633,20 +641,20 @@
     <div class="panel-title">Armor</div>
     <div class="radio-group">
       <label class="radio-label">
-        <input type="radio" name="armor" value="random">
-        <span>Random Armor Set
+        <input type="radio" name="armor" value="random" onchange="renderPreviewSkulls()">
+        <span>Random Armor Set <span class="modifier-skulls">+1 💀</span>
           <span class="sublabel">A set is randomly selected — you may not swap it out.</span>
         </span>
       </label>
       <label class="radio-label">
-        <input type="radio" name="armor" value="choice">
+        <input type="radio" name="armor" value="choice" onchange="renderPreviewSkulls()">
         <span>Choose Your Own
           <span class="sublabel">Pick any set; same restrictions apply.</span>
         </span>
       </label>
       <label class="radio-label">
-        <input type="radio" name="armor" value="none" checked>
-        <span>None
+        <input type="radio" name="armor" value="none" checked onchange="renderPreviewSkulls()">
+        <span>None <span class="modifier-skulls">−2 💀</span>
           <span class="sublabel">No armor restriction — equip freely.</span>
         </span>
       </label>
@@ -655,13 +663,43 @@
 
   <div id="warn-empty">Select at least one weapon category to roll.</div>
 
-  <button class="btn-generate" id="btn-generate" onclick="generate()">Roll Challenge Run</button>
+  <!-- Challenge Modifiers -->
+  <div class="panel" id="panel-modifiers">
+    <div class="panel-title">Challenge Modifiers</div>
+    <div class="modifier-grid">
+      <label class="check-label">
+        <input type="checkbox" id="mod-four-kings" onchange="onModifierToggle()">
+        Must Kill Four Kings <span class="modifier-skulls">+2 💀</span>
+      </label>
+      <label class="check-label">
+        <input type="checkbox" id="mod-calamity" onchange="onModifierToggle()">
+        Calamity Ring <span class="modifier-skulls">+4 💀</span>
+      </label>
+      <label class="check-label">
+        <input type="checkbox" id="mod-no-healing" onchange="onModifierToggle()">
+        No Healing <span class="modifier-skulls">+4 💀</span>
+      </label>
+      <label class="check-label">
+        <input type="checkbox" id="mod-no-leveling" onchange="onModifierToggle()">
+        No Leveling <span class="modifier-skulls">+5 💀</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Pre-roll skull preview -->
+  <div class="skull-meter" id="skull-preview" style="margin-bottom:1.2rem">
+    <div class="skull-rank">Difficulty Preview</div>
+    <div class="skull-icons" id="preview-skull-icons"></div>
+    <div class="skull-breakdown" id="preview-skull-breakdown"></div>
+    <div class="skull-title" id="preview-skull-title"></div>
+    <div class="skull-taunt" id="preview-skull-taunt"></div>
+  </div>
+
+  <button class="btn-generate" id="btn-generate" onclick="generate()">Seal Your Oath</button>
 
   <!-- Result -->
   <div class="panel" id="result">
     <div class="panel-title">Your Run</div>
-
-    <div class="oath-text" id="oath-text"></div>
 
     <div class="skull-meter" id="skull-meter">
       <div class="skull-rank">Difficulty</div>
@@ -671,20 +709,21 @@
       <div class="skull-taunt" id="skull-taunt"></div>
     </div>
 
+    <div class="oath-text" id="oath-text"></div>
+
     <div class="result-row">
       <div class="res-label">Primary Weapon
         <button class="reroll-btn" id="reroll-weapon" onclick="reroll('weapon')" title="Reroll primary weapon (2 rerolls remaining)">🎲 2</button>
       </div>
       <div class="res-name" id="res-weapon">—</div>
       <div id="res-category"></div>
-      <div class="class-rec" id="res-class"></div>
       <div id="res-upgrade"></div>
       <div id="res-notes"></div>
     </div>
 
-    <hr class="divider">
+    <hr class="divider" id="secondary-divider">
 
-    <div class="result-row">
+    <div class="result-row" id="secondary-row">
       <div class="res-label">Secondary Weapon
         <button class="reroll-btn" id="reroll-secondary" onclick="reroll('secondary')" title="Reroll secondary weapon (2 rerolls remaining)">🎲 2</button>
       </div>
@@ -710,34 +749,6 @@
       </div>
       <div class="res-name" id="res-armor">—</div>
       <div id="res-armor-notes"></div>
-    </div>
-
-    <hr class="divider">
-
-    <div class="result-row" id="modifier-row">
-      <div class="panel-title">Challenge Modifiers</div>
-      <div class="modifier-grid">
-        <label class="check-label">
-          <input type="checkbox" id="mod-no-leveling" onchange="onModifierChange()">
-          No Leveling <span class="modifier-skulls">+5 💀</span>
-        </label>
-        <label class="check-label">
-          <input type="checkbox" id="mod-calamity" onchange="onModifierChange()">
-          Calamity Ring <span class="modifier-skulls">+4 💀</span>
-        </label>
-        <label class="check-label">
-          <input type="checkbox" id="mod-four-kings" onchange="onModifierChange()">
-          Must Kill Four Kings <span class="modifier-skulls">+2 💀</span>
-        </label>
-        <label class="check-label">
-          <input type="checkbox" id="mod-no-armor" onchange="onModifierChange()">
-          No Armor <span class="modifier-skulls">+2 💀</span>
-        </label>
-        <label class="check-label">
-          <input type="checkbox" id="mod-no-healing" onchange="onModifierChange()">
-          No Healing <span class="modifier-skulls">+4 💀</span>
-        </label>
-      </div>
     </div>
 
     <button class="btn-copy-link" id="btn-copy-link" onclick="copyShareLink()">📋 Copy Share Link</button>
@@ -894,23 +905,28 @@
   const NO_SHIELD_STYLES = [
     {
       name: "Dual Wield",
-      note: "Off-hand weapon of your choice."
+      note: "Off-hand weapon of your choice.",
+      skulls: 1
     },
     {
       name: "Two-Hand Only",
-      note: "You must two-hand your weapon at all times. No off-hand weapon or item."
+      note: "You must two-hand your weapon at all times. No off-hand weapon or item.",
+      skulls: 1
     },
     {
       name: "Catalyst Off-hand",
-      note: "Start with a catalyst in your off-hand and one of the following spells: <strong>Great Soul Arrow</strong>, <strong>Homing Soulmass</strong>, or <strong>Great Magic Weapon</strong>."
+      note: "Start with a catalyst in your off-hand and one of the following spells: <strong>Great Soul Arrow</strong>, <strong>Homing Soulmass</strong>, or <strong>Great Magic Weapon</strong>.",
+      skulls: 0
     },
     {
       name: "Talisman Off-hand",
-      note: "Start with a talisman in your off-hand and one of the following miracles: <strong>Lightning Spear</strong>, <strong>Emit Force</strong>, or <strong>Heal</strong>."
+      note: "Start with a talisman in your off-hand and one of the following miracles: <strong>Lightning Spear</strong>, <strong>Emit Force</strong>, or <strong>Heal</strong>.",
+      skulls: 0
     },
     {
       name: "Pyromancy Flame Off-hand",
-      note: "Start with a Pyromancy Flame (+10) in your off-hand and one of the following pyromancies: <strong>Fire Orb</strong>, <strong>Great Fireball</strong>, <strong>Power Within</strong>, or <strong>Combustion</strong>."
+      note: "Start with a Pyromancy Flame (+10) in your off-hand and one of the following pyromancies: <strong>Fire Orb</strong>, <strong>Great Fireball</strong>, <strong>Power Within</strong>, or <strong>Combustion</strong>.",
+      skulls: 0
     }
   ];
 
@@ -1114,56 +1130,6 @@
     crossbow: "Crossbow"
   };
 
-  // ── Weapon stat requirements {str, dex, int, fth} ──
-  const WEAPON_STATS = {
-    "Dragon Bone Fist":[20,0,0,0],"Priscilla's Dagger":[6,20,0,0],"Silver Knight Str. Swd.":[16,22,0,0],
-    "Astora's Str. Sword":[10,10,0,14],"Drake Sword":[16,10,0,0],"Black Knight Sword":[20,18,0,0],
-    "Stone Greatsword":[40,10,0,0],"Cursed Greatsword of Artorias":[24,18,18,18],
-    "Greatsword of Artorias":[24,18,20,20],"Great Lord Greatsword":[20,10,0,0],
-    "Moonlight Greatsword":[16,10,28,0],"Black Knight Greatsword":[32,18,0,0],
-    "Dragon Greatsword":[50,10,0,0],"Jagged Ghost Blade":[7,0,0,0],"Quelaag's Furysword":[11,13,0,0],
-    "Gravelord Sword":[24,13,0,0],"Velka's Rapier":[8,16,16,0],"Crescent Axe":[18,12,0,16],
-    "Golem Axe":[36,8,0,0],"Black Knight Greataxe":[36,18,0,0],"Dragon King Greataxe":[50,8,0,0],
-    "Blacksmith Giant Hammer":[16,10,0,0],"Hammer of Vamos":[14,0,0,0],"Grant":[50,0,0,30],
-    "Dragon Tooth":[40,0,0,0],"Smough's Hammer":[58,0,0,0],"Channeler's Trident":[16,16,0,0],
-    "Demon's Spear":[12,10,0,0],"Silver Knight Spear":[16,22,0,0],"Moonlight Butterfly Horn":[12,0,0,0],
-    "Dragonslayer Spear":[24,24,0,0],"Giant's Halberd":[36,12,0,0],"Titanite Catch Pole":[16,14,0,0],
-    "Black Knight Halberd":[32,18,0,0],"Lifehunt Scythe & Bloodshield":[16,14,0,0],
-    "Dark Silver Tracer":[6,25,0,0],"Abyss Greatsword":[22,18,18,18],"Obsidian Greatsword":[20,16,0,0],
-    "Gold Tracer":[9,25,0,0],"Stone Greataxe":[48,10,0,0],
-    "Cestus":[5,8,0,0],"Claw":[6,14,0,0],"Dagger":[5,8,0,0],"Bandit's Knife":[6,12,0,0],
-    "Shortsword":[8,10,0,0],"Longsword":[10,10,0,0],"Broadsword":[10,10,0,0],
-    "Balder Side Sword":[10,14,0,0],"Sunlight Straight Sword":[12,12,0,0],
-    "Barbed Straight Sword":[10,10,0,0],"Darksword":[16,16,0,0],"Bastard Sword":[16,10,0,0],
-    "Claymore":[16,10,0,0],"Man-Serpent Greatsword":[24,0,0,0],"Flamberge":[16,14,0,0],
-    "Zweihander":[24,10,0,0],"Greatsword":[28,10,0,0],"Demon Great Machete":[40,0,0,0],
-    "Scimitar":[7,13,0,0],"Falchion":[9,13,0,0],"Shotel":[9,14,0,0],
-    "Painting Guardian Sword":[7,20,0,0],"Uchigatana":[14,14,0,0],"Washing Pole":[20,16,0,0],
-    "Iaito":[14,20,0,0],"Server":[9,13,0,0],"Murakumo":[28,13,0,0],
-    "Rapier":[5,8,0,0],"Estoc":[10,12,0,0],"Ricard's Rapier":[8,20,0,0],
-    "Hand Axe":[8,8,0,0],"Battle Axe":[12,8,0,0],"Butcher Knife":[24,0,0,0],
-    "Gargoyle Tail Axe":[14,14,0,0],"Greataxe":[32,8,0,0],"Demon's Greataxe":[46,0,0,0],
-    "Club":[10,0,0,0],"Mace":[12,0,0,0],"Morning Star":[11,0,0,0],"War Pick":[11,10,0,0],
-    "Pickaxe":[14,0,0,0],"Reinforced Club":[12,0,0,0],"Blacksmith Hammer":[14,0,0,0],
-    "Great Club":[28,0,0,0],"Demon's Great Hammer":[46,0,0,0],"Large Club":[26,0,0,0],
-    "Spear":[11,10,0,0],"Winged Spear":[11,10,0,0],"Partizan":[13,12,0,0],"Pike":[15,12,0,0],
-    "Halberd":[16,12,0,0],"Gargoyle's Halberd":[16,14,0,0],"Lucerne":[16,12,0,0],
-    "Scythe":[14,12,0,0],"Great Scythe":[14,14,0,0],"Whip":[7,14,0,0],"Notched Whip":[7,14,0,0],
-    "Four-Pronged Plow":[15,12,0,0],"Guardian Tail":[15,10,0,0],
-    "Short Bow":[7,12,0,0],"Composite Bow":[11,12,0,0],"Longbow":[9,14,0,0],
-    "Black Bow of Pharis":[9,18,0,0],"Darkmoon Bow":[7,16,0,0],
-    "Dragonslayer Greatbow":[20,20,0,0],"Gough's Greatbow":[27,20,0,0],
-    "Light Crossbow":[10,8,0,0],"Heavy Crossbow":[14,8,0,0],"Sniper Crossbow":[14,12,0,0],
-    "Avelyn":[13,16,0,0],
-    "Pyromancy Flame +15":[0,0,0,0],
-    "Sorcerer's Catalyst":[6,0,10,0],"Beatrice's Catalyst":[6,0,10,0],"Logan's Catalyst":[6,0,24,0],
-    "Oolacile Ivory Catalyst":[3,0,12,0],"Demon's Catalyst":[12,0,12,0],"Izalith Catalyst":[6,0,10,0],
-    "Tin Banishment Catalyst":[6,0,10,0],"Tin Crystallization Catalyst":[6,0,32,0],
-    "Tin Darkmoon Catalyst":[4,0,0,36],"Oolacile Catalyst":[3,0,10,0],"Manus Catalyst":[14,0,13,0],
-    "Canvas Talisman":[4,0,0,10],"Ivory Talisman":[4,0,0,10],"Sunlight Talisman":[4,0,0,10],
-    "Darkmoon Talisman":[4,0,0,10],"Velka's Talisman":[4,0,16,0]
-  };
-
   // ── Base weapon difficulty (skulls) ──
   const WEAPON_DIFFICULTY = {
     // 1 skull — top tier
@@ -1231,69 +1197,67 @@
     "Neither death nor hollowing shall release you.",
     "Your oath is sealed — there is no turning back."
   ];
-
-  // ── DS1 Starting classes [SL, VIT, ATT, END, STR, DEX, RES, INT, FTH] ──
-  const DS1_CLASSES = [
-    { name: "Warrior",    sl:4,  stats:[11,8,12,13,13,11,9,9] },
-    { name: "Knight",     sl:5,  stats:[14,10,10,11,11,10,9,11] },
-    { name: "Wanderer",   sl:3,  stats:[10,11,10,10,14,12,11,8] },
-    { name: "Thief",      sl:5,  stats:[9,11,9,9,15,10,12,11] },
-    { name: "Bandit",     sl:4,  stats:[12,8,14,14,9,11,8,10] },
-    { name: "Hunter",     sl:4,  stats:[11,9,11,12,14,11,9,9] },
-    { name: "Sorcerer",   sl:3,  stats:[8,15,8,9,11,8,15,8] },
-    { name: "Pyromancer", sl:1,  stats:[10,12,11,12,9,12,10,8] },
-    { name: "Cleric",     sl:2,  stats:[11,11,9,12,8,11,8,14] },
-    { name: "Deprived",   sl:6,  stats:[11,11,11,11,11,11,11,11] }
-  ];
   // stat indices: 0=VIT,1=ATT,2=END,3=STR,4=DEX,5=RES,6=INT,7=FTH
 
   // ── Skull rank titles ──
   const SKULL_RANKS = {
     1: ["Tarnished Worm","Unkindled Cur","Soul-Starved Beggar","Pestilent Drudge","Craven Maggot","Fireless Pretender","Spineless Hollow","Emberless Husk","Graveborn Leech","Ash-Forsaken Vermin"],
-    2: ["Hollow Wretch","Curse-Ridden Lout","Filthbound Drifter","Ash-Choked Vagabond","Hollow-Eyed Miscreant","Forsaken Oaf","Oathbreaking Whelp","Fallen Scourge","Honorless Sellsword","Cinder-Scarred Knight","Gutterborn Dredge"],
+    2: ["Curse-Ridden Lout","Filthbound Drifter","Ash-Choked Vagabond","Hollow-Eyed Miscreant","Forsaken Oaf","Oathbreaking Whelp","Fallen Scourge","Honorless Sellsword", "Gutterborn Dredge", "Charred Vagrant", "Hollow Scavenger"],
     3: ["Maidenless Knave","Craven Fool","Wayward Knight","Dullblade Vagabond","Faithless Warrior","Wandering Blade","Faded Warrior","Aimless Drifter"],
-    4: ["Unproven Blade","Barely-Blooded Knight","Would-be Champion","Grim Contender"],
-    5: ["Kindled Warrior","Brave Soul","Steadfast Ashsworn","Flame-bound Knight","Ashen Vanguard","Oathbound Sentinel"],
-    6: ["Flame-Bearer","Ashen Paragon","Oathforged Knight","Oathsworn Champion","Ember-Souled Warrior","Ever-Kindled Soul","Cinder-Hearted Champion"]
+    4: ["Unproven Blade","Barely-Blooded Knight","Would-be Champion","Grim Contender", "Untested Knight"],
+    5: ["Kindled Warrior","Brave Soul","Steadfast Ashsworn","Flame-bound Knight","Ashen Vanguard","Oathbound Soldier", "Oathforged Knight", "Oathsworn Sword"],
+    7: ["Flame-Bearer","Ashen Paragon","Ever-Kindled Soul","Cinder-Hearted Champion"],
+    10: ["Flameforged Legend", "Banisher of the Dark", "Light of Lordran", "Relentless Flame"]
   };
 
   // ── Taunts ──
   const SKULL_TAUNTS = {
-    1: ["Is this the best you can muster? Add a modifier… if you dare.",
+    1: ["Is this the best you can muster? Why bother.",
         "Even a Hollow could manage this. Surely you can do more.",
         "The bonfire barely flickers, for effort this meager."],
-    2: ["A timid step into the dark. The Abyss is not impressed.",
+    2: ["A timid step into the dark. Where is your spine?",
         "You call this a challenge? The Crestfallen Warrior yawns.",
         "Adequate… for an Undead with nothing to prove."],
     3: ["Passable. The flame acknowledges your presence, if little else.",
         "Neither bold nor craven. A gray path for a gray soul.",
-        "Respectable… for a Hollow."],
+        "Respectable… for a Hollow. But the flame demands more."],
     4: ["The fire burns brighter for those who dare. You have its attention.",
         "A worthy test of skill. The Lords take notice.",
         "Bold. The path ahead will break the unworthy."],
     5: ["The flame recognizes your resolve. Walk without fear.",
         "Few would choose this road. Fewer still survive it.",
         "You have earned the respect of ash and ember."],
-    6: ["A trial fit for a Lord. May your legend endure.",
+    7: ["A trial fit for a Lord. May your legend endure.",
         "The flame roars in your honor. This oath will echo through the ages.",
-        "Lordran itself trembles before your resolve."]
+        "Lordran itself trembles before your resolve."],
+    10: ["A legend for the ages. The fire itself sings your praise.",
+         "Your name will be whispered in reverence and fear for generations to come.", "The very world bends to your indomitable will."]
   };
 
   // ── Modifier definitions ──
   const MODIFIERS = [
-    { id: 'mod-no-leveling', skulls: 5, label: 'No Leveling' },
+    { id: 'mod-four-kings',  skulls: 2, label: 'Must Kill Four Kings' },
     { id: 'mod-calamity',    skulls: 4, label: 'Calamity Ring' },
-    { id: 'mod-four-kings',  skulls: 3, label: 'Must Kill Four Kings' },
-    { id: 'mod-no-armor',    skulls: 2, label: 'No Armor' },
-    { id: 'mod-no-healing',  skulls: 4, label: 'No Healing' }
+    { id: 'mod-no-healing',  skulls: 4, label: 'No Healing' },
+    { id: 'mod-no-leveling', skulls: 5, label: 'No Leveling' },
   ];
 
   // ── State ──
+  const SKULL_TIERS = Object.keys(SKULL_RANKS).map(Number).sort((a, b) => a - b);
+  function getSkullTier(total) {
+    let tier = SKULL_TIERS[0];
+    for (const t of SKULL_TIERS) { if (total >= t) tier = t; else break; }
+    return tier;
+  }
+
   let currentWeapon = null;
   let currentWeaponCat = null;
   let currentSecondary = null;
+  let currentShield = null;
+  let currentShieldStyle = null;
+  let currentStyleSkulls = 0;
+  let currentArmor = null;
   let currentPool = [];
-  let armorThematic = false;
   const rerollsLeft = { weapon: 2, secondary: 2, shield: 2, armor: 2 };
 
   function pick(arr) {
@@ -1305,12 +1269,22 @@
     return pick(filtered);
   }
 
-  function rollSecondary(excludeWeapon, primaryCat) {
-    let pool = [...SAFE_NORMAL_WEAPONS];
+  function rollSecondary(excludeWeapon, primaryCat, excludeSecondary) {
+    // Only include 2-3 skull weapons
+    let pool = SAFE_NORMAL_WEAPONS.filter(w => {
+      const d = WEAPON_DIFFICULTY[w] || 3;
+      return d >= 2 && d <= 3;
+    });
     if (primaryCat !== 'flame' && primaryCat !== 'catalyst' && primaryCat !== 'talisman') {
-      pool = pool.concat(WEAPONS.flame, WEAPONS.catalyst, WEAPONS.talisman);
+      const castingPool = [].concat(WEAPONS.flame, WEAPONS.catalyst, WEAPONS.talisman).filter(w => {
+        const d = WEAPON_DIFFICULTY[w] || 3;
+        return d >= 2 && d <= 3;
+      });
+      pool = pool.concat(castingPool);
     }
-    return pick(pool.filter(x => x !== excludeWeapon));
+    pool = pool.filter(x => x !== excludeWeapon);
+    if (excludeSecondary && pool.length > 1) pool = pool.filter(x => x !== excludeSecondary);
+    return pick(pool);
   }
 
   function updateRerollButton(id, category) {
@@ -1330,25 +1304,25 @@
     if (category === 'weapon') {
       if (currentPool.length === 0) return;
       const prevWasLifehunt = currentWeapon === 'Lifehunt Scythe & Bloodshield';
-      const { w, cat } = pick(currentPool);
+      let result;
+      do { result = pick(currentPool); } while (result.w === currentWeapon && currentPool.length > 1);
+      const { w, cat } = result;
       currentWeapon = w;
       currentWeaponCat = cat;
       renderWeapon(w, cat);
-      renderClassRec(w, cat);
       generateOathText(w);
       renderSkulls();
       // Only re-render shield if Lifehunt status changed
       const nowIsLifehunt = w === 'Lifehunt Scythe & Bloodshield';
       if (prevWasLifehunt !== nowIsLifehunt) renderShield();
-      armorThematic = true;
+      renderArmor();
     } else if (category === 'secondary') {
-      currentSecondary = rollSecondary(currentWeapon, currentWeaponCat);
+      currentSecondary = rollSecondary(currentWeapon, currentWeaponCat, currentSecondary);
       renderSecondary(currentSecondary);
     } else if (category === 'shield') {
       renderShield();
     } else if (category === 'armor') {
-      renderArmor(armorThematic);
-      armorThematic = false;
+      renderArmor();
     }
 
     updateRerollButton('reroll-' + category, category);
@@ -1400,13 +1374,17 @@
     shieldNotesEl.innerHTML = '';
 
     if (currentWeapon === 'Lifehunt Scythe & Bloodshield') {
+      currentStyleSkulls = 0;
       document.getElementById('res-shield').textContent = 'Bloodshield (included with weapon)';
       shieldNotesEl.innerHTML = '<div class="note-box">The Bloodshield is part of this weapon\'s set. Shield roll does not apply.</div>';
       document.getElementById('reroll-shield').style.display = 'none';
       shieldRow.style.display = 'block';
       shieldDivider.style.display = 'block';
     } else if (shieldMode === 'random') {
-      document.getElementById('res-shield').textContent = pick(SHIELDS);
+      currentStyleSkulls = 0;
+      const newShield = SHIELDS.length > 1 ? pickExcluding(SHIELDS, currentShield) : pick(SHIELDS);
+      currentShield = newShield;
+      document.getElementById('res-shield').textContent = newShield;
       shieldNotesEl.innerHTML = '<div class="note-box">You may only use this shield. You may not equip any other shield found in your run.</div>';
       document.getElementById('reroll-shield').style.display = '';
       shieldRow.style.display = 'block';
@@ -1418,20 +1396,27 @@
         const dupeMap = { flame: 'Pyromancy Flame Off-hand', catalyst: 'Catalyst Off-hand', talisman: 'Talisman Off-hand' };
         availableStyles = availableStyles.filter(s => s.name !== 'Two-Hand Only' && s.name !== dupeMap[cat]);
       }
+      if (currentShieldStyle && availableStyles.length > 1) {
+        availableStyles = availableStyles.filter(s => s.name !== currentShieldStyle);
+      }
       const style = pick(availableStyles);
-      document.getElementById('res-shield').textContent = 'No Shield — ' + style.name;
+      currentShieldStyle = style.name;
+      currentStyleSkulls = style.skulls;
+      const styleSkullText = style.skulls > 0 ? ` (+${style.skulls}💀)` : '';
+      document.getElementById('res-shield').textContent = 'No Shield — ' + style.name + styleSkullText;
       shieldNotesEl.innerHTML = '<div class="note-box">You may not equip any shield for the entire run.</div>'
         + `<div class="note-box">Suggestion: ${style.note}</div>`;
       document.getElementById('reroll-shield').style.display = '';
       shieldRow.style.display = 'block';
       shieldDivider.style.display = 'block';
     } else {
+      currentStyleSkulls = 0;
       shieldRow.style.display = 'none';
       shieldDivider.style.display = 'none';
     }
   }
 
-  function renderArmor(thematic) {
+  function renderArmor() {
     const armorMode     = document.querySelector('input[name="armor"]:checked').value;
     const armorRow      = document.getElementById('armor-row');
     const armorDivider  = document.getElementById('armor-divider');
@@ -1445,8 +1430,10 @@
     </div>`;
 
     if (armorMode === 'random') {
-      const armorPool = thematic ? getThematicArmor(currentWeapon) : ARMOR_SETS;
-      document.getElementById('res-armor').textContent = pick(armorPool);
+      const armorPool = getThematicArmor(currentWeapon);
+      const newArmor = armorPool.length > 1 ? pickExcluding(armorPool, currentArmor) : pick(armorPool);
+      currentArmor = newArmor;
+      document.getElementById('res-armor').textContent = newArmor;
       armorNotesEl.innerHTML = sharedArmorNote;
       document.getElementById('reroll-armor').style.display = '';
       armorRow.style.display = 'block';
@@ -1482,59 +1469,6 @@
     document.getElementById('oath-text').textContent = `${opening} ${binding} ${closing}`;
   }
 
-  // ── Starting class recommendation ──
-  function getStartingClass(weapon, cat) {
-    const raw = WEAPON_STATS[weapon] || [0,0,0,0];
-    let [str, dex, int, fth] = raw;
-
-    // 2H STR reduction for melee weapons
-    if (cat === 'unique' || cat === 'normal') {
-      str = Math.ceil(str / 1.5);
-    }
-    // Casting tool "30 in main stat" rule
-    if (cat === 'catalyst') int = Math.max(int, 30);
-    if (cat === 'talisman') {
-      if (weapon === "Velka's Talisman") int = Math.max(int, 30);
-      else fth = Math.max(fth, 30);
-    }
-    // Tin Darkmoon uses FTH
-    if (weapon === "Tin Darkmoon Catalyst") {
-      fth = Math.max(fth, 30);
-      int = raw[2]; // reset INT to base
-    }
-
-    let bestClass = null;
-    let bestTotal = Infinity;
-
-    DS1_CLASSES.forEach(cls => {
-      // stats: [VIT,ATT,END,STR,DEX,RES,INT,FTH]
-      const levelsNeeded =
-        Math.max(0, str - cls.stats[3]) +
-        Math.max(0, dex - cls.stats[4]) +
-        Math.max(0, int - cls.stats[6]) +
-        Math.max(0, fth - cls.stats[7]);
-      const total = cls.sl + levelsNeeded;
-      if (total < bestTotal) {
-        bestTotal = total;
-        bestClass = cls;
-      }
-    });
-
-    return { className: bestClass.name, level: bestTotal, str2h: str, dex, int, fth };
-  }
-
-  function renderClassRec(weapon, cat) {
-    const rec = getStartingClass(weapon, cat);
-    const parts = [];
-    if (rec.str2h > 0) parts.push(`${rec.str2h} STR (2H)`);
-    if (rec.dex > 0) parts.push(`${rec.dex} DEX`);
-    if (rec.int > 0) parts.push(`${rec.int} INT`);
-    if (rec.fth > 0) parts.push(`${rec.fth} FTH`);
-    const statsText = parts.length > 0 ? parts.join(', ') : 'No requirements';
-    document.getElementById('res-class').innerHTML =
-      `Recommended class: <strong>${rec.className}</strong> (SL${rec.level}) — ${statsText}`;
-  }
-
   // ── Skull / difficulty meter ──
   function getActiveModifiers() {
     return MODIFIERS.filter(m => document.getElementById(m.id).checked);
@@ -1544,8 +1478,21 @@
     const base = WEAPON_DIFFICULTY[currentWeapon] || 3;
     const modSkulls = getActiveModifiers().reduce((sum, m) => sum + m.skulls, 0);
     const shieldMode = document.querySelector('input[name="shield"]:checked').value;
-    const noShieldSkulls = shieldMode === 'none' ? 3 : 0;
-    return base + modSkulls + noShieldSkulls;
+    const shieldSkulls = shieldMode === 'none' ? 3 + currentStyleSkulls : shieldMode === 'random' ? 1 : -2;
+    const armorMode = document.querySelector('input[name="armor"]:checked').value;
+    const armorSkulls = armorMode === 'random' ? 1 : armorMode === 'none' ? -2 : 0;
+    const backupSkulls = document.getElementById('opt-backup').checked ? 0 : 1;
+    return Math.max(1, base + modSkulls + shieldSkulls + armorSkulls + backupSkulls);
+  }
+
+  function onModifierToggle() {
+    // Update preview if pre-roll, update post-roll if sealed
+    if (currentWeapon) {
+      renderSkulls();
+      updateShareHash();
+    } else {
+      renderPreviewSkulls();
+    }
   }
 
   function onModifierChange() {
@@ -1553,18 +1500,107 @@
     updateShareHash();
   }
 
+  function calculatePreviewSkulls() {
+    const modSkulls = getActiveModifiers().reduce((sum, m) => sum + m.skulls, 0);
+    const shieldMode = document.querySelector('input[name="shield"]:checked').value;
+    const shieldSkulls = shieldMode === 'none' ? 3 : shieldMode === 'random' ? 1 : -2;
+    const armorMode = document.querySelector('input[name="armor"]:checked').value;
+    const armorSkulls = armorMode === 'random' ? 1 : armorMode === 'none' ? -2 : 0;
+    const hasBackup = document.getElementById('opt-backup').checked;
+    const backupSkulls = hasBackup ? 0 : 1;
+    // Weapon adds 1-5 skulls
+    const minTotal = Math.max(1, 1 + modSkulls + shieldSkulls + armorSkulls + backupSkulls);
+    const maxTotal = Math.max(1, 5 + modSkulls + shieldSkulls + armorSkulls + backupSkulls);
+    return { minTotal, maxTotal };
+  }
+
+  function renderPreviewSkulls() {
+    const { minTotal, maxTotal } = calculatePreviewSkulls();
+
+    const iconsEl = document.getElementById('preview-skull-icons');
+    const breakdownEl = document.getElementById('preview-skull-breakdown');
+    const titleEl = document.getElementById('preview-skull-title');
+    const tauntEl = document.getElementById('preview-skull-taunt');
+
+    if (minTotal < 3) {
+      // Below 3: show skulls and taunt only
+      if (minTotal >= 1) {
+        iconsEl.textContent = '💀'.repeat(minTotal);
+      } else {
+        iconsEl.textContent = '';
+      }
+      iconsEl.className = 'skull-icons';
+      breakdownEl.textContent = '';
+      titleEl.textContent = '';
+      const tauntTier = getSkullTier(minTotal);
+      tauntEl.textContent = pick(SKULL_TAUNTS[tauntTier])
+        + ' It is no true Oath unless you bear 4 or more skulls.';
+      return;
+    }
+
+    if (minTotal >= 5) {
+      iconsEl.textContent = '💀'.repeat(5);
+    } else {
+      iconsEl.textContent = '💀'.repeat(minTotal);
+    }
+
+    // Breakdown
+    const parts = ['Weapon: 1–5💀'];
+    const shieldMode = document.querySelector('input[name="shield"]:checked').value;
+    const shieldSkulls = shieldMode === 'none' ? 3 : shieldMode === 'random' ? 1 : -2;
+    const shieldLabels = { none: 'No Shield', random: 'Random Shield', free: 'No Shield Restriction' };
+    parts.push(`${shieldLabels[shieldMode]}: ${shieldSkulls > 0 ? '+' : ''}${shieldSkulls}💀`);
+    const armorMode = document.querySelector('input[name="armor"]:checked').value;
+    const armorSkulls = armorMode === 'random' ? 1 : armorMode === 'none' ? -2 : 0;
+    if (armorSkulls !== 0) {
+      const armorLabels = { random: 'Random Armor', none: 'No Armor Restriction' };
+      parts.push(`${armorLabels[armorMode]}: ${armorSkulls > 0 ? '+' : ''}${armorSkulls}💀`);
+    }
+    getActiveModifiers().forEach(m => parts.push(`${m.label}: +${m.skulls}💀`));
+    if (!document.getElementById('opt-backup').checked) parts.push('No Backup: +1💀');
+    breakdownEl.textContent = parts.join(' · ');
+
+    // Fire effects
+    iconsEl.className = 'skull-icons';
+    if (minTotal >= 10) {
+      iconsEl.classList.add('fire-high');
+    } else if (minTotal >= 8) {
+      iconsEl.classList.add('fire-high');
+    } else if (minTotal >= 6) {
+      iconsEl.classList.add('fire-low');
+    }
+
+    // Rank title
+    const rankTier = getSkullTier(minTotal);
+    titleEl.textContent = pick(SKULL_RANKS[rankTier]);
+
+    // Taunt
+    const tauntTier = getSkullTier(minTotal);
+    tauntEl.textContent = pick(SKULL_TAUNTS[tauntTier])
+      + (minTotal < 4 ? ' — It is no true Oath unless you bear 4 or more skulls.' : '');
+  }
+
   function renderSkulls() {
     const total = calculateSkulls();
-    const display = Math.min(total, 12); // cap visual skulls
+    const display = Math.min(total, 5); // cap visual skulls
     const iconsEl = document.getElementById('skull-icons');
-    iconsEl.textContent = '💀'.repeat(display) + (total > 12 ? '+' : '');
+    iconsEl.textContent = '💀'.repeat(display);
 
     // Breakdown
     const base = WEAPON_DIFFICULTY[currentWeapon] || 3;
     const parts = [`${currentWeapon}: ${base}💀`];
     const shieldMode = document.querySelector('input[name="shield"]:checked').value;
-    if (shieldMode === 'none') parts.push('No Shield: +3💀');
+    const shieldSkulls = shieldMode === 'none' ? 3 + currentStyleSkulls : shieldMode === 'random' ? 1 : -2;
+    const shieldLabel = shieldMode === 'none' && currentShieldStyle ? `No Shield (${currentShieldStyle})` : ({ none: 'No Shield', random: 'Random Shield', free: 'No Shield Restriction' })[shieldMode];
+    parts.push(`${shieldLabel}: ${shieldSkulls > 0 ? '+' : ''}${shieldSkulls}💀`);
+    const armorMode = document.querySelector('input[name="armor"]:checked').value;
+    const armorSkulls = armorMode === 'random' ? 1 : armorMode === 'none' ? -2 : 0;
+    if (armorSkulls !== 0) {
+      const armorLabels = { random: 'Random Armor', none: 'No Armor Restriction' };
+      parts.push(`${armorLabels[armorMode]}: ${armorSkulls > 0 ? '+' : ''}${armorSkulls}💀`);
+    }
     getActiveModifiers().forEach(m => parts.push(`${m.label}: +${m.skulls}💀`));
+    if (!document.getElementById('opt-backup').checked) parts.push('No Backup: +1💀');
     document.getElementById('skull-breakdown').textContent = parts.join(' · ');
 
     // Fire effects
@@ -1580,14 +1616,15 @@
     }
 
     // Rank title
-    const rankTier = total >= 6 ? 6 : Math.max(1, total);
+    const rankTier = getSkullTier(total);
     const titles = SKULL_RANKS[rankTier];
     document.getElementById('skull-title').textContent = pick(titles);
 
     // Taunt
-    const tauntTier = total >= 6 ? 6 : Math.max(1, total);
+    const tauntTier = getSkullTier(total);
     const taunts = SKULL_TAUNTS[tauntTier];
-    document.getElementById('skull-taunt').textContent = pick(taunts);
+    document.getElementById('skull-taunt').textContent = pick(taunts)
+      + (total < 4 ? ' — It is no true Oath unless you bear 4 or more skulls.' : '');
   }
 
   // ── Seed encoding / decoding ──
@@ -1604,7 +1641,10 @@
       an: document.getElementById('res-armor-notes').innerHTML,
       m: MODIFIERS.map(m => document.getElementById(m.id).checked ? 1 : 0),
       r: [rerollsLeft.weapon, rerollsLeft.secondary, rerollsLeft.shield, rerollsLeft.armor],
-      o: currentOathIndices
+      o: currentOathIndices,
+      st: document.getElementById('skull-title').textContent,
+      sn: document.getElementById('skull-taunt').textContent,
+      b: document.getElementById('opt-backup').checked ? 1 : 0
     };
     return btoa(unescape(encodeURIComponent(JSON.stringify(state))));
   }
@@ -1634,6 +1674,8 @@
     document.getElementById('panel-weapon-pool').style.display = 'none';
     document.getElementById('panel-shield').style.display = 'none';
     document.getElementById('panel-armor').style.display = 'none';
+    document.getElementById('panel-modifiers').style.display = 'none';
+    document.getElementById('skull-preview').style.display = 'none';
     document.getElementById('warn-empty').style.display = 'none';
     document.getElementById('btn-generate').style.display = 'none';
 
@@ -1644,8 +1686,9 @@
     document.querySelector(`input[name="shield"][value="${state.h}"]`).checked = true;
     document.querySelector(`input[name="armor"][value="${state.a}"]`).checked = true;
 
-    // Restore modifier state
+    // Restore modifier and backup state
     MODIFIERS.forEach((m, i) => { document.getElementById(m.id).checked = !!state.m[i]; });
+    document.getElementById('opt-backup').checked = !!state.b;
 
     // Restore weapon state
     currentWeapon = state.p;
@@ -1655,8 +1698,18 @@
 
     // Render everything
     renderWeapon(state.p, state.k);
-    renderClassRec(state.p, state.k);
-    renderSecondary(state.s);
+
+    // Secondary
+    const secondaryRow = document.getElementById('secondary-row');
+    const secondaryDivider = document.getElementById('secondary-divider');
+    if (state.b && state.s) {
+      renderSecondary(state.s);
+      secondaryRow.style.display = 'block';
+      secondaryDivider.style.display = 'block';
+    } else {
+      secondaryRow.style.display = 'none';
+      secondaryDivider.style.display = 'none';
+    }
 
     // Shield
     const shieldRow = document.getElementById('shield-row');
@@ -1691,6 +1744,9 @@
 
     // Skulls
     renderSkulls();
+    // Restore saved rank/taunt if present
+    if (state.st) document.getElementById('skull-title').textContent = state.st;
+    if (state.sn) document.getElementById('skull-taunt').textContent = state.sn;
 
     // Hide reroll buttons in shared view
     document.querySelectorAll('.reroll-btn').forEach(btn => btn.style.display = 'none');
@@ -1741,18 +1797,26 @@
     // Primary weapon
     renderWeapon(weapon, cat);
 
-    // Class recommendation
-    renderClassRec(weapon, cat);
-
-    // Secondary weapon (always safe normal, different from primary)
-    currentSecondary = rollSecondary(weapon, cat);
-    renderSecondary(currentSecondary);
+    // Secondary weapon
+    const hasBackup = document.getElementById('opt-backup').checked;
+    const secondaryRow = document.getElementById('secondary-row');
+    const secondaryDivider = document.getElementById('secondary-divider');
+    if (hasBackup) {
+      currentSecondary = rollSecondary(weapon, cat);
+      renderSecondary(currentSecondary);
+      secondaryRow.style.display = 'block';
+      secondaryDivider.style.display = 'block';
+    } else {
+      currentSecondary = null;
+      secondaryRow.style.display = 'none';
+      secondaryDivider.style.display = 'none';
+    }
 
     // Shield
     renderShield();
 
-    // Armor (first roll uses thematic match)
-    renderArmor(true);
+    // Armor (thematic match)
+    renderArmor();
 
     // Oath text
     generateOathText(weapon);
@@ -1771,6 +1835,7 @@
     document.getElementById('panel-weapon-pool').style.display = 'none';
     document.getElementById('panel-shield').style.display = 'none';
     document.getElementById('panel-armor').style.display = 'none';
+    document.getElementById('skull-preview').style.display = 'none';
     document.getElementById('warn-empty').style.display = 'none';
     // Disable and restyle the generate button
     const sealEmojis = ['⚔️', '🔥', '⛓️', '💀', '🗡️', '☠️'];
@@ -1797,8 +1862,10 @@
       const state = decodeState(hash);
       if (state && state.p) {
         renderFromSeed(state);
+        return;
       }
     }
+    renderPreviewSkulls();
   })();
 </script>
 </body>
