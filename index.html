@@ -1320,8 +1320,10 @@
       renderSecondary(currentSecondary);
     } else if (category === 'shield') {
       renderShield();
+      renderSkulls();
     } else if (category === 'armor') {
       renderArmor();
+      renderSkulls();
     }
 
     updateRerollButton('reroll-' + category, category);
