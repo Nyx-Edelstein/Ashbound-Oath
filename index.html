@@ -1058,7 +1058,7 @@
 
     <div id="oath-actions" style="display:none">
       <button class="btn-copy-link" id="btn-copy-link" onclick="copyShareLink()">📋 Copy Share Link</button>
-      <button class="btn-reset-oath" id="btn-reset-oath" onclick="showResetDialog()">🔥 Abandon Oath</button>
+      <button class="btn-reset-oath" id="btn-reset-oath" onclick="showResetDialog()">🔥 Complete Oath</button>
     </div>
   </div>
 
@@ -2190,6 +2190,23 @@
     document.getElementById('panel-modifiers').style.display = 'none';
     document.getElementById('panel-hardcore').style.display = 'none';
     document.getElementById('skull-preview').style.display = 'none';
+    document.getElementById('warn-empty').style.display = 'none';
+    document.getElementById('btn-generate').style.display = 'none';
+    document.getElementById('btn-take-oath').style.display = 'none';
+    document.getElementById('oath-actions').style.display = 'none';
+    document.getElementById('char-name-row-config').style.display = 'none';
+    document.querySelector('details.rules').removeAttribute('open');
+
+    // Set radio buttons & checkboxes for skull calculation
+    let shieldVal = state.h;
+    if (shieldVal === 'none') shieldVal = 'none-physical'; // backward compat
+    const shieldRadio = document.querySelector(`input[name="shield"][value="${shieldVal}"]`);
+    if (shieldRadio) shieldRadio.checked = true;
+    document.querySelector(`input[name="armor"][value="${state.a}"]`).checked = true;
+    MODIFIERS.forEach((m, i) => { document.getElementById(m.id).checked = !!state.m[i]; });
+    const hcRadio = document.querySelector(`input[name="hardcore"][value="${state.hc || 'none'}"]`);
+    if (hcRadio) hcRadio.checked = true;
+    document.getElementById('opt-backup').checked = !!state.b;
 
     // Restore state
     currentWeapon = state.p;
