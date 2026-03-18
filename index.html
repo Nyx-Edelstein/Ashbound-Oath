@@ -791,13 +791,12 @@
       <ul>
         <li>You receive a <strong>primary weapon</strong> and a <strong>secondary weapon</strong> (backup). The secondary is always a safe normal weapon in case your primary proves unviable.</li>
         <li>You may not equip any other weapon in your <strong>right hand</strong> for the entire run.</li>
-        <li>Normal weapons start at <strong>+5 or +10</strong> — your discretion. Note: Some upgrade paths require +5 to start.</li>
-        <li>Unique / Boss weapons are <strong>not upgraded</strong>.</li>
-        <li>The Pyromancy Flame starts at <strong>+15</strong>.</li>
+        <li>All weapons start <strong>fully upgraded</strong> along whatever upgrade path you choose.</li>
+        <li>The Pyromancy Flame starts at <strong>+5 Ascended</strong>.</li>
         <li>For any build, you may use an unupgraded <strong>Pyromancy Flame</strong> with <strong>Power Within</strong> in your off-hand once you obtain the items in your run.</li>
         <li>If your weapon is a <strong>bow</strong>, you may give yourself <strong>999 basic Arrows</strong>.</li>
         <li>If your weapon is a <strong>crossbow</strong>, you may give yourself <strong>999 basic Bolts</strong>.</li>
-        <li>If your weapon is a <strong>flame, catalyst, or talisman</strong>, you may start with 30 in your main stat and one damaging spell whose stat requirement is <strong>≤ 30</strong>.</li>
+        <li>If your weapon is a <strong>flame, catalyst, or talisman</strong>, you may start with 40 in your main stat and one damaging spell whose stat requirement is <strong>≤ 40</strong>.</li>
       </ul>
       <h3>Shield (if enabled)</h3>
       <ul>
@@ -1195,7 +1194,7 @@
       "Avelyn"
     ],
     flame: [
-      "Pyromancy Flame +15"
+      "Ascended Pyromancy Flame +5"
     ],
     catalyst: [
       "Sorcerer's Catalyst",
@@ -1230,7 +1229,7 @@
     },
     {
       name: "Pyromancy Flame Off-hand",
-      note: "Start with a Pyromancy Flame (+10) in your off-hand and one of the following pyromancies: <strong>Fire Orb</strong>, <strong>Great Fireball</strong>, <strong>Power Within</strong>, or <strong>Combustion</strong>."
+      note: "Start with an <strong>Ascended Pyromancy Flame +5</strong> in your off-hand and one of the following pyromancies: <strong>Fire Orb</strong>, <strong>Great Fireball</strong>, <strong>Power Within</strong>, or <strong>Combustion</strong>."
     }
   ];
 
@@ -1694,13 +1693,9 @@
       `<span class="category-tag">${CAT_LABELS[cat]}</span>`;
 
     let upgradeText = '';
-    if (cat === 'unique')                       upgradeText = 'Start upgraded';
-    else if (cat === 'normal')                  upgradeText = 'Start at +5 or +10 — your discretion';
-    else if (cat === 'flame')                   upgradeText = 'Start at +15';
-    else if (cat === 'bow' || cat === 'crossbow') {
-      const isUniqueBow = ["Darkmoon Bow", "Dragonslayer Greatbow", "Gough's Greatbow"].includes(weapon);
-      upgradeText = isUniqueBow ? 'Start upgraded' : 'Start at +5 or +10 — your discretion';
-    } else                                      upgradeText = 'No upgrade path';
+    if (cat === 'flame')                        upgradeText = 'Start at +15';
+    else if (cat === 'catalyst' || cat === 'talisman') upgradeText = 'No upgrade path';
+    else                                        upgradeText = 'Start fully upgraded — any upgrade path';
     document.getElementById('res-upgrade').innerHTML = `<div class="note-box">${upgradeText}</div>`;
 
     const notesEl = document.getElementById('res-notes');
@@ -1711,7 +1706,7 @@
       notesEl.innerHTML += `<div class="note-box">You may give yourself <strong>999 Bolts</strong>.</div>`;
     }
     if (cat === 'flame' || cat === 'catalyst' || cat === 'talisman') {
-      notesEl.innerHTML += `<div class="note-box">You may start with 30 in your main stat and <strong>one damaging spell</strong> whose stat requirement is <strong>≤ 30</strong>.</div>`;
+      notesEl.innerHTML += `<div class="note-box">You may start with 40 in your main stat and <strong>one damaging spell</strong> whose stat requirement is <strong>≤ 40</strong>.</div>`;
     }
   }
 
@@ -1719,7 +1714,7 @@
     document.getElementById('res-secondary').textContent = weapon;
     const isCasting = WEAPONS.flame.includes(weapon) || WEAPONS.catalyst.includes(weapon) || WEAPONS.talisman.includes(weapon);
     const note = isCasting
-      ? 'Backup casting tool. You may start with 30 in your main stat and <strong>one damaging spell</strong> whose stat requirement is <strong>≤ 30</strong>.'
+      ? 'Backup casting tool. You may start with 40 in your main stat and <strong>one damaging spell</strong> whose stat requirement is <strong>≤ 40</strong>.'
       : 'Backup weapon. Starts at <strong>+5 or +10</strong> — your discretion.';
     document.getElementById('res-secondary-notes').innerHTML =
       `<div class="note-box">${note} You are not required to use both, but this provides some flexibility.</div>`;
