@@ -963,19 +963,19 @@
       <label class="radio-label">
         <input type="radio" name="hardcore" value="frail" onchange="onModifierToggle()">
         <span>Frail <span class="modifier-skulls">+3 💀</span>
-          <span class="sublabel">Any death while hollow ends the run. The oath is honored, but not fulfilled.</span>
+          <span class="sublabel">Any death while hollow ends the run. You may restart with the same conditions, or begin a new run with this oath being honored, but not fulfilled.</span>
         </span>
       </label>
       <label class="radio-label">
         <input type="radio" name="hardcore" value="hardcore" onchange="onModifierToggle()">
         <span>Hardcore <span class="modifier-skulls">+5 💀</span>
-          <span class="sublabel">Any death without a Ring of Sacrifice or Rare Ring of Sacrifice equipped ends the run.</span>
+          <span class="sublabel">Any death without a Ring of Sacrifice or Rare Ring of Sacrifice equipped ends the run. You may restart with the same conditions, or begin a new run with this oath being honored, but not fulfilled.</span>
         </span>
       </label>
       <label class="radio-label">
         <input type="radio" name="hardcore" value="insanity" onchange="onModifierToggle()">
         <span>Insanity <span class="modifier-skulls">+10 💀</span>
-          <span class="sublabel">Any death — for any reason — ends the run. No exceptions.</span>
+          <span class="sublabel">Any death — for any reason — ends the run. No exceptions. You may restart with the same conditions, or begin a new run with this oath being honored, but not fulfilled.</span>
         </span>
       </label>
     </div>
@@ -2436,7 +2436,7 @@
         hideModal();
         showModal(
           'Oath Honored?',
-          'Did you at least kindle a flame beyond Firelink? Did you raise your weapon against the dark, however briefly? The fire does not forget those who tried.',
+          'Did you at least kindle a flame beyond Firelink? Did you raise your weapon against the dark, however briefly? The fire does not forget those who honored their oath.',
           'Yes — I walked the path',
           'No…',
           () => {
@@ -2452,8 +2452,8 @@
             hideModal();
             showModal(
               'Oathbreaker',
-              'Then you are a filthy, wretched, cowardly, maidenless oathbreaker. Do you accept this shame?',
-              'Yes… I am hollow',
+              'Then you are a filthy, wretched, vile, contemptable, craven, maidenless oathbreaker. Do you accept this shame?',
+              'Yes... I am a maidenless oathbreaker',
               'No — I will try again',
               () => {
                 const stats = loadStats();
