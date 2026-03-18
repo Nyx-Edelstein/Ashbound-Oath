@@ -2386,6 +2386,8 @@
     oathTaken = true;
     document.querySelectorAll('.reroll-btn').forEach(btn => btn.style.display = 'none');
     document.getElementById('btn-take-oath').style.display = 'none';
+    document.getElementById('panel-modifiers').style.display = 'none';
+    document.getElementById('panel-hardcore').style.display = 'none';
     document.getElementById('oath-actions').style.display = 'block';
     document.getElementById('char-name-row-config').style.display = 'none';
     saveCachedOath();
@@ -2500,6 +2502,7 @@
 
     document.getElementById('result').style.display = 'none';
     document.getElementById('char-name-display').style.display = 'none';
+    document.querySelectorAll('.reroll-btn').forEach(btn => btn.style.display = '');
     document.body.classList.remove('screen-burn');
     document.querySelectorAll('.fire-bg, .blood-rain').forEach(el => el.remove());
     history.replaceState(null, '', window.location.pathname);
