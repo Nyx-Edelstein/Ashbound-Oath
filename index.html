@@ -2667,6 +2667,17 @@
     attachConfigSave();
     renderPreviewSkulls();
   })();
+
+  // ── Handle navigating to a share link while page is already open ──
+  window.addEventListener('hashchange', function() {
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+      const state = decodeState(hash);
+      if (state && state.p) {
+        window.location.reload();
+      }
+    }
+  });
 </script>
 </body>
 </html>
