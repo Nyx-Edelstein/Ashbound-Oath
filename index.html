@@ -53,7 +53,7 @@
 
     /* ── Panels ── */
     .panel {
-      background: #161309;
+      background: rgba(22, 19, 9, 0.9);
       border: 1px solid #302618;
       border-radius: 3px;
       padding: 1.4rem 1.5rem;
@@ -431,6 +431,44 @@
       to   { opacity: 0.9; }
     }
 
+    /* ── Tier 17: fullscreen fire background ── */
+    .fire-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('https://64.media.tumblr.com/0927cc3a916cf89223201869bb914924/tumblr_ncc0cjC7t51tmrmr3o1_1280.gif') center center / cover no-repeat;
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.35;
+    }
+
+    /* ── Tier 23: per-letter wiggle on rank title ── */
+    .skull-title .wiggle-letter {
+      display: inline-block;
+      animation: letterBurn 0.15s ease-in-out infinite alternate;
+    }
+
+    @keyframes letterBurn {
+      0%   { transform: translateY(-1px) rotate(-1.5deg); }
+      100% { transform: translateY(1px) rotate(1.5deg); }
+    }
+
+    /* ── Tier 30: blood rain full page ── */
+    .blood-rain {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('https://media1.tenor.com/m/BxxRacg1OdwAAAAd/background-dripping.gif') repeat-x top;
+      background-size: 100% auto;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.3;
+    }
+
     /* ── Modifier panel ── */
     .modifier-grid {
       display: grid;
@@ -442,6 +480,11 @@
       font-size: 0.75rem;
       color: #cbc8c2;
       margin-left: 0.3rem;
+    }
+
+    .modifier-tooltip {
+      cursor: help;
+      border-bottom: 1px dotted #6a5a40;
     }
 
     /* ── Copy link ── */
@@ -830,13 +873,13 @@
       </label>
       <label class="radio-label">
         <input type="radio" name="shield" value="none-physical" onchange="renderPreviewSkulls()">
-        <span>No Shield (Two-Hand or Dual Wield) <span class="modifier-skulls">+4 💀</span>
+        <span>No Shield (Two-Hand or Dual Wield) <span class="modifier-skulls">+2 💀</span>
           <span class="sublabel">No shield. Two-hand your weapon or dual wield any off-hand weapon you scavenge during your run.</span>
         </span>
       </label>
       <label class="radio-label">
         <input type="radio" name="shield" value="none-caster" onchange="renderPreviewSkulls()">
-        <span>No Shield (Caster Off-Hand) <span class="modifier-skulls">+3 💀</span>
+        <span>No Shield (Caster Off-Hand) <span class="modifier-skulls">+2 💀</span>
           <span class="sublabel">No shield. Use a catalyst, talisman, or pyromancy flame in your off-hand with a starting spell.</span>
         </span>
       </label>
@@ -881,12 +924,20 @@
     <div class="panel-title">Challenge Modifiers</div>
     <div class="modifier-grid">
       <label class="check-label">
+        <input type="checkbox" id="mod-no-grinding" onchange="onModifierToggle()">
+        <span class="modifier-tooltip" title="You may not rest at the same bonfire more than once per visit to an area. You may return to previously visited bonfires in other areas, but once you leave a bonfire behind, you cannot use it again until you have rested elsewhere.">No Grinding</span> <span class="modifier-skulls">+1 💀</span>
+      </label>
+      <label class="check-label">
         <input type="checkbox" id="mod-four-kings" onchange="onModifierToggle()">
         Must Kill Four Kings <span class="modifier-skulls">+2 💀</span>
       </label>
       <label class="check-label">
         <input type="checkbox" id="mod-calamity" onchange="onModifierToggle()">
-        Calamity Ring <span class="modifier-skulls">+4 💀</span>
+        Calamity Ring <span class="modifier-skulls">+6 💀</span>
+      </label>
+      <label class="check-label">
+        <input type="checkbox" id="mod-dusk-crown" onchange="onModifierToggle()">
+        Dusk Crown Ring <span class="modifier-skulls">+3 💀</span>
       </label>
       <label class="check-label">
         <input type="checkbox" id="mod-no-healing" onchange="onModifierToggle()">
@@ -895,6 +946,37 @@
       <label class="check-label">
         <input type="checkbox" id="mod-no-leveling" onchange="onModifierToggle()">
         No Leveling <span class="modifier-skulls">+5 💀</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Hardcore Mode -->
+  <div class="panel" id="panel-hardcore">
+    <div class="panel-title">Hardcore Mode</div>
+    <div class="radio-group">
+      <label class="radio-label">
+        <input type="radio" name="hardcore" value="none" checked onchange="onModifierToggle()">
+        <span>Disabled
+          <span class="sublabel">No death penalty beyond the normal Dark Souls experience.</span>
+        </span>
+      </label>
+      <label class="radio-label">
+        <input type="radio" name="hardcore" value="frail" onchange="onModifierToggle()">
+        <span>Frail <span class="modifier-skulls">+3 💀</span>
+          <span class="sublabel">Any death while hollow ends the run. The oath is honored, but not fulfilled.</span>
+        </span>
+      </label>
+      <label class="radio-label">
+        <input type="radio" name="hardcore" value="hardcore" onchange="onModifierToggle()">
+        <span>Hardcore <span class="modifier-skulls">+5 💀</span>
+          <span class="sublabel">Any death without a Ring of Sacrifice or Rare Ring of Sacrifice equipped ends the run.</span>
+        </span>
+      </label>
+      <label class="radio-label">
+        <input type="radio" name="hardcore" value="insanity" onchange="onModifierToggle()">
+        <span>Insanity <span class="modifier-skulls">+10 💀</span>
+          <span class="sublabel">Any death — for any reason — ends the run. No exceptions.</span>
+        </span>
       </label>
     </div>
   </div>
@@ -1443,12 +1525,15 @@
   // ── Skull rank titles ──
   const SKULL_RANKS = {
     1: ["Tarnished Worm","Unkindled Cur","Soul-Starved Beggar","Pestilent Drudge","Craven Maggot","Fireless Pretender","Spineless Hollow","Emberless Husk","Graveborn Leech","Ash-Forsaken Vermin"],
-    2: ["Curse-Ridden Lout","Filthbound Drifter","Ash-Choked Vagabond","Hollow-Eyed Miscreant","Forsaken Oaf","Oathbreaking Whelp","Fallen Scourge","Honorless Sellsword", "Gutterborn Dredge", "Charred Vagrant"],
+    2: ["Curse-Ridden Lout","Filthbound Drifter","Ash-Choked Vagabond","Hollow-Eyed Miscreant","Forsaken Oaf","Oathbreaking Whelp","Fallen Scourge","Honorless Sellsword","Gutterborn Dredge","Charred Vagrant"],
     3: ["Maidenless Knave","Craven Fool","Wayward Knight","Dullblade Vagabond","Faithless Warrior","Wandering Blade","Faded Warrior","Aimless Drifter"],
-    4: ["Unproven Blade","Barely-Blooded Knight","Would-be Champion","Grim Contender", "Untested Knight", "Untried Aspirant"],
-    5: ["Brave Soul","Flame-bound Knight","Ashen Vanguard","Oathbound Soldier", "Oathforged Knight", "Oathsworn Warrior", "Ashsworn Sword"],
-    7: ["Flame-Bearer","Ashen Paragon","Ever-Kindled Soul","Cinder-Hearted Champion", "Oathsworn Hero", "Flameforged Champion"],
-    10: ["Flameforged Legend", "Banisher of the Darkness", "Light of Lordran"]
+    4: ["Unproven Blade","Barely-Blooded Knight","Would-be Champion","Grim Contender","Untested Knight","Untried Aspirant"],
+    5: ["Brave Soul","Flame-bound Knight","Ashen Vanguard","Oathbound Soldier","Oathforged Knight","Oathsworn Warrior","Ashsworn Sword"],
+    8: ["Flame-Bearer","Ashen Paragon","Ever-Kindled Soul","Cinder-Hearted Champion","Oathsworn Hero","Flameforged Champion"],
+    12: ["Flameforged Legend","Banisher of the Darkness","Light of Lordran"],
+    17: ["Godslayer Incarnate","Kindler of Dead Suns","The Undying Flame","Lordbane","Ash That Would Not Fade"],
+    23: ["The One the Abyss Fears","First Flame's Final Argument","Hollowed God","Sin Incarnate","Demons Run Scared"],
+    30: ["Gwyn Weeps at the Menu Screen","The Bonfire Files a Restraining Order","Seek Professional Help","Certified Masochist of Lordran","The Asylum Demon Turned Around and Left"]
   };
 
   // ── Taunts ──
@@ -1467,23 +1552,40 @@
         "Bold. The path ahead will break the unworthy."],
     5: ["The flame recognizes your resolve. Walk without fear.",
         "Few would choose this path. Your courage speaks to your strength.",
-        "The fire consumes the unworthy. Your oath proves your are not among them."],
-    7: ["Your resolve is as unyielding as the flame itself. Press onward.",
+        "The fire consumes the unworthy. Your oath proves you are not among them."],
+    8: ["Your resolve is as unyielding as the flame itself. Press onward.",
         "It is a rare soul who dares to take up this challenge. The flame honors your courage.",
         "Your tenacity is second to none. The fire respects your determination."],
-    10: ["Your soul is a beacon in the darkness. May your courage light the way for others to follow.",
-      "Your oath kindles the spirits of the hopeless. May your trial inspire others to rise.",
-      "Your soul burns with radiant intensity. Press onward so that others may find their way."],
-
+    12: ["Your soul is a beacon in the darkness. May your courage light the way for others to follow.",
+        "Your oath kindles the spirits of the hopeless. May your trial inspire others to rise.",
+        "Your soul burns with radiant intensity. Press onward so that others may find their way."],
+    17: ["This is no longer a challenge run. This is a cry for help.",
+        "The gods themselves would call this excessive.",
+        "The fire does not burn this bright without cost. What have you sacrificed?"],
+    23: ["You have gone beyond what the flame was meant to test. This is obsession.",
+        "Lordran was not designed to be survived like this. You have broken something sacred.",
+        "Even Patches would look at this and feel concern."],
+    30: ["This is not a run. This is a hostage situation between you and the game.",
+        "Congratulations. You have invented a new kind of suffering. Miyazaki would be genuinely worried.",
+        "The bonfire refuses to kindle. It is afraid of you."]
   };
 
   // ── Modifier definitions ──
   const MODIFIERS = [
     { id: 'mod-four-kings',  skulls: 2, label: 'Must Kill Four Kings' },
-    { id: 'mod-calamity',    skulls: 4, label: 'Calamity Ring' },
+    { id: 'mod-calamity',    skulls: 6, label: 'Calamity Ring' },
+    { id: 'mod-dusk-crown',  skulls: 3, label: 'Dusk Crown Ring' },
     { id: 'mod-no-healing',  skulls: 4, label: 'No Healing' },
     { id: 'mod-no-leveling', skulls: 5, label: 'No Leveling' },
+    { id: 'mod-no-grinding', skulls: 1, label: 'No Grinding' },
   ];
+
+  const HARDCORE_MODES = {
+    none:     { skulls: 0, label: '' },
+    frail:    { skulls: 3, label: 'Frail' },
+    hardcore: { skulls: 5, label: 'Hardcore' },
+    insanity: { skulls: 10, label: 'Insanity' },
+  };
 
   // ── State ──
   const SKULL_TIERS = Object.keys(SKULL_RANKS).map(Number).sort((a, b) => a - b);
@@ -1721,15 +1823,23 @@
     return MODIFIERS.filter(m => document.getElementById(m.id).checked);
   }
 
+  function getHardcoreMode() {
+    return document.querySelector('input[name="hardcore"]:checked').value;
+  }
+
+  function getHardcoreSkulls() {
+    return HARDCORE_MODES[getHardcoreMode()].skulls;
+  }
+
   function calculateSkulls() {
     const base = WEAPON_DIFFICULTY[currentWeapon] || 3;
     const modSkulls = getActiveModifiers().reduce((sum, m) => sum + m.skulls, 0);
     const shieldMode = document.querySelector('input[name="shield"]:checked').value;
-    const shieldSkulls = shieldMode === 'none-physical' ? 4 : shieldMode === 'none-caster' ? 3 : shieldMode === 'random' ? 1 : -2;
+    const shieldSkulls = shieldMode === 'none-physical' ? 2 : shieldMode === 'none-caster' ? 2 : shieldMode === 'random' ? 1 : -2;
     const armorMode = document.querySelector('input[name="armor"]:checked').value;
     const armorSkulls = armorMode === 'random' ? 1 : armorMode === 'none' ? -2 : 0;
     const backupSkulls = document.getElementById('opt-backup').checked ? 0 : 1;
-    return Math.max(1, base + modSkulls + shieldSkulls + armorSkulls + backupSkulls);
+    return Math.max(1, base + modSkulls + getHardcoreSkulls() + shieldSkulls + armorSkulls + backupSkulls);
   }
 
   function onModifierToggle() {
@@ -1747,15 +1857,15 @@
 
   function calculatePreviewSkulls() {
     const modSkulls = getActiveModifiers().reduce((sum, m) => sum + m.skulls, 0);
+    const hcSkulls = getHardcoreSkulls();
     const shieldMode = document.querySelector('input[name="shield"]:checked').value;
-    const shieldSkulls = shieldMode === 'none-physical' ? 4 : shieldMode === 'none-caster' ? 3 : shieldMode === 'random' ? 1 : -2;
+    const shieldSkulls = shieldMode === 'none-physical' ? 2 : shieldMode === 'none-caster' ? 2 : shieldMode === 'random' ? 1 : -2;
     const armorMode = document.querySelector('input[name="armor"]:checked').value;
     const armorSkulls = armorMode === 'random' ? 1 : armorMode === 'none' ? -2 : 0;
     const hasBackup = document.getElementById('opt-backup').checked;
     const backupSkulls = hasBackup ? 0 : 1;
-    // Weapon adds 1-5 skulls
-    const minTotal = Math.max(1, 1 + modSkulls + shieldSkulls + armorSkulls + backupSkulls);
-    const maxTotal = Math.max(1, 5 + modSkulls + shieldSkulls + armorSkulls + backupSkulls);
+    const minTotal = Math.max(1, 1 + modSkulls + hcSkulls + shieldSkulls + armorSkulls + backupSkulls);
+    const maxTotal = Math.max(1, 5 + modSkulls + hcSkulls + shieldSkulls + armorSkulls + backupSkulls);
     return { minTotal, maxTotal };
   }
 
@@ -1770,7 +1880,7 @@
     if (minTotal < 3) {
       // Below 3: show skulls and taunt only
       if (minTotal >= 1) {
-        iconsEl.textContent = '💀'.repeat(minTotal);
+        iconsEl.textContent = '💀x' + minTotal;
       } else {
         iconsEl.textContent = '';
       }
@@ -1783,16 +1893,12 @@
       return;
     }
 
-    if (minTotal >= 5) {
-      iconsEl.textContent = '💀'.repeat(5);
-    } else {
-      iconsEl.textContent = '💀'.repeat(minTotal);
-    }
+    iconsEl.textContent = '💀x' + minTotal;
 
     // Breakdown
     const parts = ['Weapon: 1–5💀'];
     const shieldMode = document.querySelector('input[name="shield"]:checked').value;
-    const shieldSkulls = shieldMode === 'none-physical' ? 4 : shieldMode === 'none-caster' ? 3 : shieldMode === 'random' ? 1 : -2;
+    const shieldSkulls = shieldMode === 'none-physical' ? 2 : shieldMode === 'none-caster' ? 2 : shieldMode === 'random' ? 1 : -2;
     const shieldLabels = { 'none-physical': 'No Shield (Two-Hand/Dual Wield)', 'none-caster': 'No Shield (Caster Off-Hand)', random: 'Random Shield', free: 'No Shield Restriction' };
     parts.push(`${shieldLabels[shieldMode]}: ${shieldSkulls > 0 ? '+' : ''}${shieldSkulls}💀`);
     const armorMode = document.querySelector('input[name="armor"]:checked').value;
@@ -1802,14 +1908,16 @@
       parts.push(`${armorLabels[armorMode]}: ${armorSkulls > 0 ? '+' : ''}${armorSkulls}💀`);
     }
     getActiveModifiers().forEach(m => parts.push(`${m.label}: +${m.skulls}💀`));
+    const hcMode = getHardcoreMode();
+    if (hcMode !== 'none') parts.push(`${HARDCORE_MODES[hcMode].label}: +${HARDCORE_MODES[hcMode].skulls}💀`);
     if (!document.getElementById('opt-backup').checked) parts.push('No Backup: +1💀');
     breakdownEl.textContent = parts.join(' · ');
 
     // Fire effects
     iconsEl.className = 'skull-icons';
-    if (minTotal >= 10) {
+    if (minTotal >= 12) {
       iconsEl.classList.add('fire-high');
-    } else if (minTotal >= 7) {
+    } else if (minTotal >= 8) {
       iconsEl.classList.add('fire-high');
     } else if (minTotal >= 5) {
       iconsEl.classList.add('fire-low');
@@ -1827,15 +1935,14 @@
 
   function renderSkulls() {
     const total = calculateSkulls();
-    const display = Math.min(total, 5); // cap visual skulls
     const iconsEl = document.getElementById('skull-icons');
-    iconsEl.textContent = '💀'.repeat(display);
+    iconsEl.textContent = '💀x' + total;
 
     // Breakdown
     const base = WEAPON_DIFFICULTY[currentWeapon] || 3;
     const parts = [`${currentWeapon}: ${base}💀`];
     const shieldMode = document.querySelector('input[name="shield"]:checked').value;
-    const shieldSkulls = shieldMode === 'none-physical' ? 4 : shieldMode === 'none-caster' ? 3 : shieldMode === 'random' ? 1 : -2;
+    const shieldSkulls = shieldMode === 'none-physical' ? 2 : shieldMode === 'none-caster' ? 2 : shieldMode === 'random' ? 1 : -2;
     const shieldLabel = ({ 'none-physical': 'No Shield (Two-Hand/Dual Wield)', 'none-caster': 'No Shield (Caster Off-Hand)', random: 'Random Shield', free: 'No Shield Restriction' })[shieldMode];
     parts.push(`${shieldLabel}: ${shieldSkulls > 0 ? '+' : ''}${shieldSkulls}💀`);
     const armorMode = document.querySelector('input[name="armor"]:checked').value;
@@ -1845,13 +1952,29 @@
       parts.push(`${armorLabels[armorMode]}: ${armorSkulls > 0 ? '+' : ''}${armorSkulls}💀`);
     }
     getActiveModifiers().forEach(m => parts.push(`${m.label}: +${m.skulls}💀`));
+    const hcMode = getHardcoreMode();
+    if (hcMode !== 'none') parts.push(`${HARDCORE_MODES[hcMode].label}: +${HARDCORE_MODES[hcMode].skulls}💀`);
     if (!document.getElementById('opt-backup').checked) parts.push('No Backup: +1💀');
     document.getElementById('skull-breakdown').textContent = parts.join(' · ');
 
     // Fire effects
     iconsEl.className = 'skull-icons';
     document.body.classList.remove('screen-burn');
-    if (total >= 10) {
+    document.querySelectorAll('.fire-bg, .blood-rain').forEach(el => el.remove());
+    if (total >= 30) {
+      iconsEl.classList.add('fire-high');
+      document.body.classList.add('screen-burn');
+      if (!document.querySelector('.fire-bg')) { const f = document.createElement('div'); f.className = 'fire-bg'; document.body.appendChild(f); }
+      if (!document.querySelector('.blood-rain')) { const b = document.createElement('div'); b.className = 'blood-rain'; document.body.appendChild(b); }
+    } else if (total >= 23) {
+      iconsEl.classList.add('fire-high');
+      document.body.classList.add('screen-burn');
+      if (!document.querySelector('.fire-bg')) { const f = document.createElement('div'); f.className = 'fire-bg'; document.body.appendChild(f); }
+    } else if (total >= 17) {
+      iconsEl.classList.add('fire-high');
+      document.body.classList.add('screen-burn');
+      if (!document.querySelector('.fire-bg')) { const f = document.createElement('div'); f.className = 'fire-bg'; document.body.appendChild(f); }
+    } else if (total >= 12) {
       iconsEl.classList.add('fire-high');
       document.body.classList.add('screen-burn');
     } else if (total >= 8) {
@@ -1863,7 +1986,15 @@
     // Rank title
     const rankTier = getSkullTier(total);
     const titles = SKULL_RANKS[rankTier];
-    document.getElementById('skull-title').textContent = pick(titles);
+    const titleText = pick(titles);
+    const titleEl = document.getElementById('skull-title');
+    if (total >= 23) {
+      titleEl.innerHTML = titleText.split('').map((ch, i) =>
+        ch === ' ' ? ' ' : `<span class="wiggle-letter" style="animation-delay:${(i * 0.04).toFixed(2)}s">${ch}</span>`
+      ).join('');
+    } else {
+      titleEl.textContent = titleText;
+    }
 
     // Taunt
     const tauntTier = getSkullTier(total);
@@ -1894,6 +2025,7 @@
       a: ARMOR_MODES.indexOf(armorMode),
       ari: currentArmor ? ARMOR_SETS.indexOf(currentArmor) : 0,
       mb: MODIFIERS.reduce((bits, m, i) => bits | (document.getElementById(m.id).checked ? (1 << i) : 0), 0),
+      hc: getHardcoreMode(),
       o: currentOathIndices,
       b: document.getElementById('opt-backup').checked ? 1 : 0,
       n: characterName
@@ -1931,7 +2063,8 @@
       currentOathIndices[0], currentOathIndices[1], currentOathIndices[2],
       document.getElementById('opt-backup').checked ? 1 : 0,
       characterName || '',
-      stats.completed, stats.honored, stats.broken, stats.maxSkulls
+      stats.completed, stats.honored, stats.broken, stats.maxSkulls,
+      getHardcoreMode()
     ];
     return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
   }
@@ -1950,8 +2083,10 @@
       if (Array.isArray(raw)) {
         const [wi, si, hi, shi, hci, ai, ari, mb, oi, bi, ci, bk, nameOrLegacy, ...rest] = raw;
         const name = typeof nameOrLegacy === 'string' ? nameOrLegacy : '';
+        // rest = [completed, honored, broken, maxSkulls, hardcoreMode?]
         const sharerStats = rest.length >= 3 ? { completed: rest[0], honored: rest[1], broken: rest[2], maxSkulls: rest[3] || 0 }
-          : (typeof nameOrLegacy === 'number' ? null : null);
+          : null;
+        const hcMode = rest.length >= 5 && typeof rest[4] === 'string' ? rest[4] : 'none';
         const { name: wn, cat: wc } = indexToWeapon(wi);
         return {
           p: wn, k: wc,
@@ -1964,7 +2099,8 @@
           o: [oi, bi, ci],
           b: bk,
           n: name,
-          ss: sharerStats
+          ss: sharerStats,
+          hc: hcMode
         };
       }
       return null;
@@ -2052,22 +2188,8 @@
     document.getElementById('panel-shield').style.display = 'none';
     document.getElementById('panel-armor').style.display = 'none';
     document.getElementById('panel-modifiers').style.display = 'none';
+    document.getElementById('panel-hardcore').style.display = 'none';
     document.getElementById('skull-preview').style.display = 'none';
-    document.getElementById('warn-empty').style.display = 'none';
-    document.getElementById('btn-generate').style.display = 'none';
-    document.getElementById('btn-take-oath').style.display = 'none';
-    document.getElementById('oath-actions').style.display = 'none';
-    document.getElementById('char-name-row-config').style.display = 'none';
-    document.querySelector('details.rules').removeAttribute('open');
-
-    // Set radio buttons
-    let shieldVal = state.h;
-    if (shieldVal === 'none') shieldVal = 'none-physical'; // backward compat
-    const shieldRadio = document.querySelector(`input[name="shield"][value="${shieldVal}"]`);
-    if (shieldRadio) shieldRadio.checked = true;
-    document.querySelector(`input[name="armor"][value="${state.a}"]`).checked = true;
-    MODIFIERS.forEach((m, i) => { document.getElementById(m.id).checked = !!state.m[i]; });
-    document.getElementById('opt-backup').checked = !!state.b;
 
     // Restore state
     currentWeapon = state.p;
@@ -2178,6 +2300,8 @@
     document.querySelector(`input[name="shield"][value="${shieldMode}"]`).checked = true;
     document.querySelector(`input[name="armor"][value="${armorMode}"]`).checked = true;
     MODIFIERS.forEach((m, i) => { document.getElementById(m.id).checked = !!((data.mb >> i) & 1); });
+    const hcRadioCached = document.querySelector(`input[name="hardcore"][value="${data.hc || 'none'}"]`);
+    if (hcRadioCached) hcRadioCached.checked = true;
     document.getElementById('opt-backup').checked = !!data.b;
 
     // Render
@@ -2202,6 +2326,7 @@
     document.getElementById('panel-shield').style.display = 'none';
     document.getElementById('panel-armor').style.display = 'none';
     document.getElementById('panel-modifiers').style.display = 'none';
+    document.getElementById('panel-hardcore').style.display = 'none';
     document.getElementById('skull-preview').style.display = 'none';
     document.getElementById('warn-empty').style.display = 'none';
     document.getElementById('btn-generate').style.display = 'none';
@@ -2336,6 +2461,7 @@
     document.getElementById('panel-shield').style.display = '';
     document.getElementById('panel-armor').style.display = '';
     document.getElementById('panel-modifiers').style.display = '';
+    document.getElementById('panel-hardcore').style.display = '';
     document.getElementById('skull-preview').style.display = '';
 
     const btn = document.getElementById('btn-generate');
@@ -2346,6 +2472,7 @@
     document.getElementById('result').style.display = 'none';
     document.getElementById('char-name-display').style.display = 'none';
     document.body.classList.remove('screen-burn');
+    document.querySelectorAll('.fire-bg, .blood-rain').forEach(el => el.remove());
     history.replaceState(null, '', window.location.pathname);
     restoreConfig();
     renderPreviewSkulls();
@@ -2361,6 +2488,7 @@
       mod: CONFIG_MODIFIERS.map(id => document.getElementById(id).checked ? 1 : 0),
       shield: document.querySelector('input[name="shield"]:checked').value,
       armor: document.querySelector('input[name="armor"]:checked').value,
+      hardcore: getHardcoreMode(),
       name: characterName
     };
     localStorage.setItem('ashbound-config', JSON.stringify(cfg));
@@ -2378,6 +2506,7 @@
     if (cfg.mod) CONFIG_MODIFIERS.forEach((id, i) => { document.getElementById(id).checked = !!cfg.mod[i]; });
     if (cfg.shield) { const r = document.querySelector(`input[name="shield"][value="${cfg.shield}"]`); if (r) r.checked = true; }
     if (cfg.armor) { const r = document.querySelector(`input[name="armor"][value="${cfg.armor}"]`); if (r) r.checked = true; }
+    if (cfg.hardcore) { const r = document.querySelector(`input[name="hardcore"][value="${cfg.hardcore}"]`); if (r) r.checked = true; }
     if (cfg.name) {
       characterName = cfg.name;
       document.getElementById('char-name-config').value = cfg.name;
@@ -2389,6 +2518,7 @@
     CONFIG_CHECKBOXES.forEach(id => document.getElementById(id).addEventListener('change', saveConfig));
     document.querySelectorAll('input[name="shield"]').forEach(r => r.addEventListener('change', saveConfig));
     document.querySelectorAll('input[name="armor"]').forEach(r => r.addEventListener('change', saveConfig));
+    document.querySelectorAll('input[name="hardcore"]').forEach(r => r.addEventListener('change', saveConfig));
   }
 
   // ── Generate ──
