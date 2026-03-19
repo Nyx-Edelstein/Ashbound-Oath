@@ -833,14 +833,30 @@
     </div>
     <hr class="divider" style="margin:0.8rem 0">
     <label class="check-label">
-      <input type="checkbox" id="opt-backup" checked onchange="renderPreviewSkulls(); document.getElementById('opt-prefer-caster').closest('label').style.display = this.checked ? '' : 'none';">
+      <input type="checkbox" id="opt-backup" checked onchange="renderPreviewSkulls(); document.getElementById('backup-pref-group').style.display = this.checked ? '' : 'none';">
       Backup Weapon <span class="modifier-skulls">+1 💀 if disabled</span>
     </label>
-    <label class="check-label" style="margin-left:1.5rem">
-      <input type="checkbox" id="opt-prefer-caster">
-      Prefer Caster Backup
-      <span class="sublabel" style="display:inline; margin-left:0.3rem; font-size:0.75rem; color:#6a5a40">(always rolls a catalyst, talisman, or flame)</span>
-    </label>
+    <div id="backup-pref-group" style="margin-left:1.5rem; margin-top:0.3rem">
+      <div style="font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; color:#8a7860; margin-bottom:0.25rem">Backup Preference</div>
+      <label class="radio-label" style="font-size:0.85rem">
+        <input type="radio" name="backup-pref" value="none" checked>
+        <span>No Preference</span>
+      </label>
+      <label class="radio-label" style="font-size:0.85rem">
+        <input type="radio" name="backup-pref" value="caster">
+        <span>Prefer Caster</span>
+      </label>
+      <label class="radio-label" style="font-size:0.85rem">
+        <input type="radio" name="backup-pref" value="melee">
+        <span>Prefer Melee</span>
+      </label>
+      <label class="radio-label" style="font-size:0.85rem">
+        <input type="radio" name="backup-pref" value="alternate">
+        <span>Prefer Alternate
+          <span class="sublabel">If your primary is melee, rolls a casting implement, and vice versa.</span>
+        </span>
+      </label>
+    </div>
   </div>
 
   <!-- Shield -->
@@ -1589,17 +1605,32 @@
   }
 
   function rollSecondary(excludeWeapon, primaryCat, excludeSecondary) {
-    const preferCaster = document.getElementById('opt-prefer-caster').checked;
+    const backupPref = document.querySelector('input[name="backup-pref"]:checked').value;
+    const isCasterPrimary = ['flame', 'catalyst', 'talisman'].includes(primaryCat);
+    let wantCaster = false;
+    let wantMelee = false;
+    if (backupPref === 'caster') wantCaster = true;
+    else if (backupPref === 'melee') wantMelee = true;
+    else if (backupPref === 'alternate') {
+      if (isCasterPrimary) wantMelee = true;
+      else wantCaster = true;
+    }
+
     let pool;
-    if (preferCaster) {
+    if (wantCaster) {
       pool = [].concat(WEAPONS.flame, WEAPONS.catalyst, WEAPONS.talisman);
-    } else {
-      // Only include 2-3 skull weapons
+    } else if (wantMelee) {
       pool = SAFE_NORMAL_WEAPONS.filter(w => {
         const d = WEAPON_DIFFICULTY[w] || 3;
         return d >= 2 && d <= 3;
       });
-      if (primaryCat !== 'flame' && primaryCat !== 'catalyst' && primaryCat !== 'talisman') {
+    } else {
+      // No preference: mix of melee + casting (if primary isn't already casting)
+      pool = SAFE_NORMAL_WEAPONS.filter(w => {
+        const d = WEAPON_DIFFICULTY[w] || 3;
+        return d >= 2 && d <= 3;
+      });
+      if (!isCasterPrimary) {
         const castingPool = [].concat(WEAPONS.flame, WEAPONS.catalyst, WEAPONS.talisman).filter(w => {
           const d = WEAPON_DIFFICULTY[w] || 3;
           return d >= 2 && d <= 3;
@@ -2451,7 +2482,7 @@
   }
 
   // ── Config persistence ──
-  const CONFIG_CHECKBOXES = ['pool-unique','pool-normal','pool-flame','pool-catalyst','pool-talisman','pool-bow','pool-crossbow','opt-backup','opt-prefer-caster'];
+  const CONFIG_CHECKBOXES = ['pool-unique','pool-normal','pool-flame','pool-catalyst','pool-talisman','pool-bow','pool-crossbow','opt-backup'];
   const CONFIG_MODIFIERS = MODIFIERS.map(m => m.id);
 
   function saveConfig() {
@@ -2461,7 +2492,9 @@
       shield: document.querySelector('input[name="shield"]:checked').value,
       armor: document.querySelector('input[name="armor"]:checked').value,
       hardcore: getHardcoreMode(),
-      name: characterName
+      backupPref: document.querySelector('input[name="backup-pref"]:checked').value,
+      name: characterName,
+      rulesOpen: document.querySelector('details.rules').hasAttribute('open') ? 1 : 0
     };
     localStorage.setItem('ashbound-config', JSON.stringify(cfg));
   }
@@ -2479,6 +2512,11 @@
     if (cfg.shield) { const r = document.querySelector(`input[name="shield"][value="${cfg.shield}"]`); if (r) r.checked = true; }
     if (cfg.armor) { const r = document.querySelector(`input[name="armor"][value="${cfg.armor}"]`); if (r) r.checked = true; }
     if (cfg.hardcore) { const r = document.querySelector(`input[name="hardcore"][value="${cfg.hardcore}"]`); if (r) r.checked = true; }
+    if (cfg.backupPref) { const r = document.querySelector(`input[name="backup-pref"][value="${cfg.backupPref}"]`); if (r) r.checked = true; }
+    if (cfg.rulesOpen !== undefined) {
+      const rules = document.querySelector('details.rules');
+      if (cfg.rulesOpen) rules.setAttribute('open', ''); else rules.removeAttribute('open');
+    }
     if (cfg.name) {
       characterName = cfg.name;
       document.getElementById('char-name-config').value = cfg.name;
@@ -2491,6 +2529,8 @@
     document.querySelectorAll('input[name="shield"]').forEach(r => r.addEventListener('change', saveConfig));
     document.querySelectorAll('input[name="armor"]').forEach(r => r.addEventListener('change', saveConfig));
     document.querySelectorAll('input[name="hardcore"]').forEach(r => r.addEventListener('change', saveConfig));
+    document.querySelectorAll('input[name="backup-pref"]').forEach(r => r.addEventListener('change', saveConfig));
+    document.querySelector('details.rules').addEventListener('toggle', saveConfig);
   }
 
   // ── Generate ──
