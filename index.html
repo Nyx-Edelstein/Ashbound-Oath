@@ -760,7 +760,7 @@
         <li><strong>Offline mode</strong> only. <strong>New Game+</strong> (NG+1).</li>
         <li><strong>Remove your Estus Flask</strong> after the Undead Asylum. You do not have one. All other healing (Humanity, Divine Blessings, miracles, etc.) is permitted.</li>
         <li>Give yourself the <strong>minimum stats to one-hand your primary weapon</strong> and <strong>two-hand your backup</strong>. Bows, crossbows, and shields grant enough stats to <strong>fully wield</strong>. Give yourself enough <strong>Endurance</strong> to stay under 100% equip load with your starting gear.</li>
-        <li>Each <strong>casting implement</strong> you start with grants <strong>one Attunement slot</strong>. Primary casting weapon: <strong>40</strong> in its casting stat. Secondary implement: <strong>25</strong>.</li>
+        <li>A <strong>primary casting weapon</strong> grants <strong>40</strong> in its casting stat and enough <strong>Attunement for 3 spell slots</strong>. A <strong>secondary casting implement</strong> grants <strong>25</strong> in its casting stat and enough <strong>Attunement for 1 spell slot</strong>.</li>
         <li>Start with an empty inventory except your starting gift, class items, and rolled equipment. You may level up freely during the run.</li>
       </ul>
       <h3>Goal</h3>
@@ -1675,7 +1675,7 @@
       notesEl.innerHTML += `<div class="note-box">You may give yourself <strong>999 Bolts</strong>.</div>`;
     }
     if (cat === 'flame' || cat === 'catalyst' || cat === 'talisman') {
-      notesEl.innerHTML += `<div class="note-box">Grants <strong>40</strong> in your primary casting stat and <strong>one Attunement slot</strong>.</div>`;
+      notesEl.innerHTML += `<div class="note-box">Grants <strong>40</strong> in your primary casting stat and enough <strong>Attunement for 3 spell slots</strong>.</div>`;
     }
   }
 
@@ -1683,7 +1683,7 @@
     document.getElementById('res-secondary').textContent = weapon;
     const isCasting = WEAPONS.flame.includes(weapon) || WEAPONS.catalyst.includes(weapon) || WEAPONS.talisman.includes(weapon);
     const note = isCasting
-      ? 'Backup casting tool. You may give yourself the <strong>minimum stats to two-hand</strong> this weapon. Grants <strong>25</strong> in its casting stat and <strong>one Attunement slot</strong>.'
+      ? 'Backup casting tool. You may give yourself the <strong>minimum stats to two-hand</strong> this weapon. Grants <strong>25</strong> in its casting stat and enough <strong>Attunement for 1 spell slot</strong>.'
       : 'Backup weapon. Starts <strong>fully upgraded</strong> — any upgrade path. You may give yourself the <strong>minimum stats to two-hand</strong> this weapon.';
     document.getElementById('res-secondary-notes').innerHTML =
       `<div class="note-box">${note} You are not required to use both, but this provides some flexibility.</div>`;
