@@ -760,8 +760,8 @@
         <li><strong>Offline mode</strong> only. <strong>New Game+</strong> (NG+1).</li>
         <li><strong>Remove your Estus Flask</strong> after the Undead Asylum. You do not have one. All other healing (Humanity, Divine Blessings, miracles, etc.) is permitted.</li>
         <li>Give yourself the <strong>minimum stats to one-hand your primary weapon</strong> and <strong>two-hand your backup</strong>. Bows, crossbows, and shields grant enough stats to <strong>fully wield</strong>. Give yourself enough <strong>Endurance</strong> to stay under 100% equip load with your starting gear.</li>
-        <li>Each <strong>casting implement</strong> you start with grants <strong>one Attunement slot</strong>. Primary casting weapon: <strong>40</strong> in its casting stat. Secondary or off-hand implement: <strong>25</strong>.</li>
-        <li>Start at Firelink Shrine with an empty inventory except your starting gift, class items, and rolled equipment. You may level up freely during the run.</li>
+        <li>Each <strong>casting implement</strong> you start with grants <strong>one Attunement slot</strong>. Primary casting weapon: <strong>40</strong> in its casting stat. Secondary implement: <strong>25</strong>.</li>
+        <li>Start with an empty inventory except your starting gift, class items, and rolled equipment. You may level up freely during the run.</li>
       </ul>
       <h3>Goal</h3>
       <ul>
@@ -769,7 +769,7 @@
       </ul>
       <h3>Bosses</h3>
       <ul>
-        <li>Taurus Demon, Bell Gargoyles, Capra Demon, Gaping Dragon, Quelaag, Iron Golem, Moonlight Butterfly, Sif, Ceaseless Discharge, Pinwheel, Crossbreed Priscilla, Stray Demon, Dark Sun Gwyndolin, <strong>Ornstein &amp; Smough</strong></li>
+        <li>Asylum Demon, Taurus Demon, Bell Gargoyles, Capra Demon, Gaping Dragon, Quelaag, Ceaseless Discharge, Moonlight Butterfly, Sif, Stray Demon, Pinwheel, Iron Golem, Crossbreed Priscilla, Dark Sun Gwyndolin, <strong>Ornstein &amp; Smough</strong></li>
         <li><em>(Optional)</em> Four Kings</li>
       </ul>
       <h3>Weapon</h3>
@@ -783,7 +783,6 @@
       <ul>
         <li><strong>Random Shield:</strong> You may only use the rolled shield.</li>
         <li><strong>No Shield (Two-Hand / Dual Wield):</strong> No shields. Two-hand your weapon or dual wield with scavenged off-hand weapons.</li>
-        <li><strong>No Shield (Caster Off-Hand):</strong> No shields. Use a catalyst, talisman, or pyromancy flame in your off-hand. Grants <strong>25 in its casting stat</strong> and <strong>one Attunement slot</strong>.</li>
         <li><strong>No Restrictions:</strong> Equip any shield freely.</li>
       </ul>
       <h3>Armor</h3>
@@ -858,12 +857,6 @@
         <input type="radio" name="shield" value="none-physical" onchange="renderPreviewSkulls()">
         <span>No Shield (Two-Hand or Dual Wield) <span class="modifier-skulls">+2 💀</span>
           <span class="sublabel">No shield. Two-hand your weapon or dual wield any off-hand weapon you scavenge during your run.</span>
-        </span>
-      </label>
-      <label class="radio-label">
-        <input type="radio" name="shield" value="none-caster" onchange="renderPreviewSkulls()">
-        <span>No Shield (Caster Off-Hand) <span class="modifier-skulls">+2 💀</span>
-          <span class="sublabel">No shield. Use a catalyst, talisman, or pyromancy flame in your off-hand with a starting spell.</span>
         </span>
       </label>
       <label class="radio-label">
@@ -1202,21 +1195,6 @@
     ]
   };
 
-  const CASTER_OFFHAND_SUGGESTIONS = [
-    {
-      name: "Catalyst Off-hand",
-      note: "Start with a catalyst in your off-hand. Grants <strong>25 INT</strong> and <strong>one Attunement slot</strong>."
-    },
-    {
-      name: "Talisman Off-hand",
-      note: "Start with a talisman in your off-hand. Grants <strong>25 FTH</strong> and <strong>one Attunement slot</strong>."
-    },
-    {
-      name: "Pyromancy Flame Off-hand",
-      note: "Start with an <strong>Ascended Pyromancy Flame +5</strong> in your off-hand. Grants <strong>one Attunement slot</strong>."
-    }
-  ];
-
   const SHIELDS = [
     "Small Leather Shield", "Leather Shield", "Target Shield", "Buckler",
     "Cracked Round Shield", "Warrior's Round Shield", "Red & White Round Shield",
@@ -1395,7 +1373,7 @@
     WEAPON_CAT_BOUNDARIES.push({ cat, start: ALL_WEAPONS_FLAT.length });
     WEAPONS[cat].forEach(w => ALL_WEAPONS_FLAT.push(w));
   });
-  const SHIELD_MODES = ['random', 'none-physical', 'none-caster', 'free'];
+  const SHIELD_MODES = ['random', 'none-physical', 'free'];
   const ARMOR_MODES = ['random', 'choice', 'none'];
 
   function weaponToIndex(name) { return ALL_WEAPONS_FLAT.indexOf(name); }
@@ -1740,14 +1718,6 @@
       document.getElementById('reroll-shield').style.display = 'none';
       shieldRow.style.display = 'block';
       shieldDivider.style.display = 'block';
-    } else if (shieldMode === 'none-caster') {
-      currentShieldStyle = 'Caster Off-Hand';
-      document.getElementById('res-shield').textContent = 'No Shield — Caster Off-Hand';
-      shieldNotesEl.innerHTML = '<div class="note-box">You may not equip any shield for the entire run.</div>'
-        + '<div class="note-box">Choose a <strong>catalyst</strong>, <strong>talisman</strong>, or <strong>pyromancy flame</strong> for your off-hand. Grants <strong>25</strong> in its casting stat and <strong>one Attunement slot</strong>.</div>';
-      document.getElementById('reroll-shield').style.display = 'none';
-      shieldRow.style.display = 'block';
-      shieldDivider.style.display = 'block';
     } else {
       shieldRow.style.display = 'none';
       shieldDivider.style.display = 'none';
@@ -1824,7 +1794,7 @@
     const base = WEAPON_DIFFICULTY[currentWeapon] || 3;
     const modSkulls = getActiveModifiers().reduce((sum, m) => sum + m.skulls, 0);
     const shieldMode = document.querySelector('input[name="shield"]:checked').value;
-    const shieldSkulls = shieldMode === 'none-physical' ? 2 : shieldMode === 'none-caster' ? 2 : shieldMode === 'random' ? 1 : -2;
+    const shieldSkulls = shieldMode === 'none-physical' ? 2 : shieldMode === 'random' ? 1 : -2;
     const armorMode = document.querySelector('input[name="armor"]:checked').value;
     const armorSkulls = armorMode === 'random' ? 1 : armorMode === 'none' ? -2 : 0;
     const backupSkulls = document.getElementById('opt-backup').checked ? 0 : 1;
@@ -1848,7 +1818,7 @@
     const modSkulls = getActiveModifiers().reduce((sum, m) => sum + m.skulls, 0);
     const hcSkulls = getHardcoreSkulls();
     const shieldMode = document.querySelector('input[name="shield"]:checked').value;
-    const shieldSkulls = shieldMode === 'none-physical' ? 2 : shieldMode === 'none-caster' ? 2 : shieldMode === 'random' ? 1 : -2;
+    const shieldSkulls = shieldMode === 'none-physical' ? 2 : shieldMode === 'random' ? 1 : -2;
     const armorMode = document.querySelector('input[name="armor"]:checked').value;
     const armorSkulls = armorMode === 'random' ? 1 : armorMode === 'none' ? -2 : 0;
     const hasBackup = document.getElementById('opt-backup').checked;
@@ -1875,7 +1845,8 @@
       }
       iconsEl.className = 'skull-icons';
       breakdownEl.textContent = '';
-      titleEl.textContent = '';
+      const rankTier = getSkullTier(minTotal);
+      titleEl.textContent = pick(SKULL_RANKS[rankTier]);
       const tauntTier = getSkullTier(minTotal);
       tauntEl.textContent = pick(SKULL_TAUNTS[tauntTier])
         + ' It is no true Oath unless you bear 4 or more skulls.';
@@ -1887,8 +1858,8 @@
     // Breakdown
     const parts = ['Weapon: 1–5💀'];
     const shieldMode = document.querySelector('input[name="shield"]:checked').value;
-    const shieldSkulls = shieldMode === 'none-physical' ? 2 : shieldMode === 'none-caster' ? 2 : shieldMode === 'random' ? 1 : -2;
-    const shieldLabels = { 'none-physical': 'No Shield (Two-Hand/Dual Wield)', 'none-caster': 'No Shield (Caster Off-Hand)', random: 'Random Shield', free: 'No Shield Restriction' };
+    const shieldSkulls = shieldMode === 'none-physical' ? 2 : shieldMode === 'random' ? 1 : -2;
+    const shieldLabels = { 'none-physical': 'No Shield (Two-Hand/Dual Wield)', random: 'Random Shield', free: 'No Shield Restriction' };
     parts.push(`${shieldLabels[shieldMode]}: ${shieldSkulls > 0 ? '+' : ''}${shieldSkulls}💀`);
     const armorMode = document.querySelector('input[name="armor"]:checked').value;
     const armorSkulls = armorMode === 'random' ? 1 : armorMode === 'none' ? -2 : 0;
@@ -1931,8 +1902,8 @@
     const base = WEAPON_DIFFICULTY[currentWeapon] || 3;
     const parts = [`${currentWeapon}: ${base}💀`];
     const shieldMode = document.querySelector('input[name="shield"]:checked').value;
-    const shieldSkulls = shieldMode === 'none-physical' ? 2 : shieldMode === 'none-caster' ? 2 : shieldMode === 'random' ? 1 : -2;
-    const shieldLabel = ({ 'none-physical': 'No Shield (Two-Hand/Dual Wield)', 'none-caster': 'No Shield (Caster Off-Hand)', random: 'Random Shield', free: 'No Shield Restriction' })[shieldMode];
+    const shieldSkulls = shieldMode === 'none-physical' ? 2 : shieldMode === 'random' ? 1 : -2;
+    const shieldLabel = ({ 'none-physical': 'No Shield (Two-Hand/Dual Wield)', random: 'Random Shield', free: 'No Shield Restriction' })[shieldMode];
     parts.push(`${shieldLabel}: ${shieldSkulls > 0 ? '+' : ''}${shieldSkulls}💀`);
     const armorMode = document.querySelector('input[name="armor"]:checked').value;
     const armorSkulls = armorMode === 'random' ? 1 : armorMode === 'none' ? -2 : 0;
@@ -2010,7 +1981,6 @@
       s: currentSecondary ? weaponToIndex(currentSecondary) : -1,
       h: SHIELD_MODES.indexOf(shieldMode),
       shi: currentShield ? SHIELDS.indexOf(currentShield) : 0,
-      hci: currentShieldStyle ? Math.max(0, CASTER_OFFHAND_SUGGESTIONS.findIndex(s => s.name === currentShieldStyle)) : 0,
       a: ARMOR_MODES.indexOf(armorMode),
       ari: currentArmor ? ARMOR_SETS.indexOf(currentArmor) : 0,
       mb: MODIFIERS.reduce((bits, m, i) => bits | (document.getElementById(m.id).checked ? (1 << i) : 0), 0),
@@ -2045,7 +2015,7 @@
       currentSecondary ? weaponToIndex(currentSecondary) : -1,
       SHIELD_MODES.indexOf(shieldMode),
       shieldMode === 'random' ? SHIELDS.indexOf(currentShield) : 0,
-      shieldMode === 'none-caster' ? Math.max(0, CASTER_OFFHAND_SUGGESTIONS.findIndex(s => s.name === currentShieldStyle)) : 0,
+      0,
       ARMOR_MODES.indexOf(armorMode),
       armorMode === 'random' ? ARMOR_SETS.indexOf(currentArmor) : 0,
       MODIFIERS.reduce((bits, m, i) => bits | (document.getElementById(m.id).checked ? (1 << i) : 0), 0),
@@ -2132,12 +2102,6 @@
     } else if (shieldMode === 'none-physical') {
       document.getElementById('res-shield').textContent = 'No Shield — Two-Hand or Dual Wield';
       shieldNotesEl.innerHTML = '<div class="note-box">You may not equip any shield for the entire run.</div><div class="note-box">Two-hand your weapon or use any off-hand weapon you scavenge during your run.</div>';
-      shieldRow.style.display = 'block';
-      shieldDivider.style.display = 'block';
-    } else if (shieldMode === 'none-caster' && currentShieldStyle) {
-      document.getElementById('res-shield').textContent = 'No Shield — Caster Off-Hand';
-      shieldNotesEl.innerHTML = '<div class="note-box">You may not equip any shield for the entire run.</div>'
-        + '<div class="note-box">Choose a <strong>catalyst</strong>, <strong>talisman</strong>, or <strong>pyromancy flame</strong> for your off-hand. Grants <strong>25</strong> in its casting stat and <strong>one Attunement slot</strong>.</div>';
       shieldRow.style.display = 'block';
       shieldDivider.style.display = 'block';
     } else {
@@ -2245,7 +2209,6 @@
       }
     } else {
       if (state.h === 'random') currentShield = SHIELDS[state.shi] || SHIELDS[0];
-      if (state.h === 'none-caster') currentShieldStyle = (CASTER_OFFHAND_SUGGESTIONS[state.hci] || CASTER_OFFHAND_SUGGESTIONS[0]).name;
       renderShieldFromState(shieldVal);
     }
 
@@ -2296,7 +2259,6 @@
     currentSecondary = data.s >= 0 ? ALL_WEAPONS_FLAT[data.s] : null;
     const shieldMode = SHIELD_MODES[data.h];
     if (shieldMode === 'random') currentShield = SHIELDS[data.shi];
-    if (shieldMode === 'none-caster') currentShieldStyle = (CASTER_OFFHAND_SUGGESTIONS[data.hci] || CASTER_OFFHAND_SUGGESTIONS[0]).name;
     const armorMode = ARMOR_MODES[data.a];
     if (armorMode === 'random') currentArmor = ARMOR_SETS[data.ari];
     currentOathIndices = data.o;
