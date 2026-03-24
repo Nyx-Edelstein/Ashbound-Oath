@@ -455,18 +455,34 @@
       100% { transform: translateY(1px) rotate(1.5deg); }
     }
 
-    /* ── Tier 30: blood rain full page ── */
+    /* ── Tier 30: screen glitch / corruption ── */
+    .screen-glitch {
+      animation: glitchPulse 4s ease-in-out infinite;
+    }
+
+    @keyframes glitchPulse {
+      0%, 100% { filter: none; }
+      15%      { filter: hue-rotate(20deg) saturate(1.3); }
+      30%      { filter: hue-rotate(-15deg) brightness(1.1); }
+      45%      { filter: none; }
+      60%      { filter: hue-rotate(35deg) saturate(1.5) brightness(0.95); }
+      75%      { filter: hue-rotate(-10deg); }
+    }
+
+    /* ── Tier 38: blood rain full page ── */
     .blood-rain {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: url('https://media1.tenor.com/m/BxxRacg1OdwAAAAd/background-dripping.gif') repeat-x top;
+      background: url('https://media1.tenor.com/m/BxxRacg1OdwAAAAd/background-dripping.gif') repeat top;
       background-size: 100% auto;
       pointer-events: none;
       z-index: 9999;
       opacity: 0.3;
+      min-height: 100vh;
+      min-height: 100dvh;
     }
 
     /* ── Modifier panel ── */
@@ -758,10 +774,10 @@
       <h3>Setup</h3>
       <ul>
         <li><strong>Offline mode</strong> only. <strong>New Game+</strong> (NG+1).</li>
-        <li><strong>Remove your Estus Flask</strong> after the Undead Asylum. You do not have one. All other healing (Humanity, Divine Blessings, miracles, etc.) is permitted.</li>
-        <li>Give yourself the <strong>minimum stats to one-hand your primary weapon</strong> and <strong>two-hand your backup</strong>. Bows, crossbows, and shields grant enough stats to <strong>fully wield</strong>. Give yourself enough <strong>Endurance</strong> to stay under 100% equip load with your starting gear.</li>
-        <li>A <strong>primary casting weapon</strong> grants <strong>40</strong> in its casting stat and enough <strong>Attunement for 3 spell slots</strong>. A <strong>secondary casting implement</strong> grants <strong>25</strong> in its casting stat and enough <strong>Attunement for 1 spell slot</strong>.</li>
-        <li>Start with an empty inventory except your starting gift, class items, and rolled equipment. You may level up freely during the run.</li>
+        <li>Your <strong>weapons, shield, and armor</strong> are randomly rolled. You must use only what the Oath gives you — see sections below for details.</li>
+        <li><strong>Immediately remove your Estus Flask</strong>. You do not have one. All other healing (Humanity, Divine Blessings, miracles, etc.) is permitted (excepting challenge modifiers).</li>
+        <li>Choose a <strong>Starting Level</strong> option. You may pick any class and allocate stats freely, as long as your Soul Level does not exceed the chosen cap. If leveling is allowed, you may level up freely during the run. If not, you must remain at the Soul Level you started with.</li>
+        <li>Start with an empty inventory except your starting gift, class items (picked up at the Asylum), and rolled equipment. Note: Unless one of your Oath weapons is a Pyromancy Flame, you may not upgrade a Pyromancy Flame obtained by starting with the Pyromancer class.</li>
       </ul>
       <h3>Goal</h3>
       <ul>
@@ -776,8 +792,8 @@
       <ul>
         <li>You receive a <strong>primary</strong> and <strong>secondary</strong> (backup) weapon. You may not equip any other weapons in your main hand for the entire run.</li>
         <li>All weapons start <strong>fully upgraded</strong> along any upgrade path. The Pyromancy Flame starts at <strong>Ascended +5</strong>.</li>
-        <li>Any build may use an unupgraded <strong>Pyromancy Flame</strong> with <strong>Power Within</strong> in the off-hand once obtained in your run.</li>
-        <li>Bows grant <strong>999 Arrows</strong>. Crossbows grant <strong>999 Bolts</strong>.</li>
+        <li>Any build may use an unupgraded <strong>Pyromancy Flame</strong> once obtained in your run.</li>
+        <li>Bows grant <strong>999 Arrows</strong> to start. Crossbows grant <strong>999 Bolts</strong> to start.</li>
       </ul>
       <h3>Shield</h3>
       <ul>
@@ -916,8 +932,10 @@
     <div class="panel-title">Challenge Modifiers</div>
     <div class="modifier-grid">
       <label class="check-label">
-        <input type="checkbox" id="mod-no-grinding" onchange="onModifierToggle()">
-        <span class="modifier-tooltip" title="You may not kill the same enemies repeatedly with the intention of gaining souls. Killing enemies as you are moving between areas is allowed.">No Grinding</span> <span class="modifier-skulls">+1 💀</span>
+        <input type="checkbox" id="mod-limited-bonfires" onchange="onModifierToggle()">
+        <span>Limited Bonfires <span class="modifier-skulls">+3 💀</span>
+          <span class="sublabel">Once you leave a bonfire and venture into the world, that bonfire is permanently spent — you may not return to it. Dying and respawning does not spend it. Firelink Shrine is exempt.</span>
+        </span>
       </label>
       <label class="check-label">
         <input type="checkbox" id="mod-four-kings" onchange="onModifierToggle()">
@@ -934,10 +952,6 @@
       <label class="check-label">
         <input type="checkbox" id="mod-no-healing" onchange="onModifierToggle()">
         No Healing <span class="modifier-skulls">+4 💀</span>
-      </label>
-      <label class="check-label">
-        <input type="checkbox" id="mod-no-leveling" onchange="onModifierToggle()">
-        No Leveling <span class="modifier-skulls">+5 💀</span>
       </label>
     </div>
   </div>
@@ -971,6 +985,62 @@
         </span>
       </label>
     </div>
+  </div>
+
+  <!-- Starting Level -->
+  <div class="panel" id="panel-starting-level">
+    <div class="panel-title">Starting Level</div>
+    <div class="radio-group">
+      <label class="radio-label">
+        <input type="radio" name="starting-level" value="sl45-level" checked onchange="onModifierToggle()">
+        <span>SL45, Leveling Allowed
+          <span class="sublabel">Allocate your stats freely among any class at or below Soul Level 45. You may level up during the run.</span>
+        </span>
+      </label>
+      <label class="radio-label">
+        <input type="radio" name="starting-level" value="class-level" onchange="onModifierToggle()">
+        <span>Default Class Level, Leveling Allowed <span class="modifier-skulls">+2 💀</span>
+          <span class="sublabel">Start at your chosen class's default level and stats. You may level up during the run.</span>
+        </span>
+      </label>
+      <label class="radio-label">
+        <input type="radio" name="starting-level" value="sl90-nolevel" onchange="onModifierToggle()">
+        <span>SL90, No Leveling <span class="modifier-skulls">+1 💀</span>
+          <span class="sublabel">Allocate stats freely at or below Soul Level 90. No leveling during the run.</span>
+        </span>
+      </label>
+      <label class="radio-label">
+        <input type="radio" name="starting-level" value="sl75-nolevel" onchange="onModifierToggle()">
+        <span>SL75, No Leveling <span class="modifier-skulls">+2 💀</span>
+          <span class="sublabel">Allocate stats freely at or below Soul Level 75. No leveling during the run.</span>
+        </span>
+      </label>
+      <label class="radio-label">
+        <input type="radio" name="starting-level" value="sl60-nolevel" onchange="onModifierToggle()">
+        <span>SL60, No Leveling <span class="modifier-skulls">+3 💀</span>
+          <span class="sublabel">Allocate stats freely at or below Soul Level 60. No leveling during the run.</span>
+        </span>
+      </label>
+      <label class="radio-label">
+        <input type="radio" name="starting-level" value="sl45-nolevel" onchange="onModifierToggle()">
+        <span>SL45, No Leveling <span class="modifier-skulls">+5 💀</span>
+          <span class="sublabel">Allocate stats freely at or below Soul Level 45. No leveling during the run.</span>
+        </span>
+      </label>
+      <label class="radio-label">
+        <input type="radio" name="starting-level" value="sl30-nolevel" onchange="onModifierToggle()">
+        <span>SL30, No Leveling <span class="modifier-skulls">+7 💀</span>
+          <span class="sublabel">Allocate stats freely at or below Soul Level 30. No leveling during the run.</span>
+        </span>
+      </label>
+      <label class="radio-label">
+        <input type="radio" name="starting-level" value="class-nolevel" onchange="onModifierToggle()">
+        <span>Default Class Level, No Leveling <span class="modifier-skulls">+10 💀</span>
+          <span class="sublabel">Start at your chosen class's default level and stats. No leveling during the run.</span>
+        </span>
+      </label>
+    </div>
+    <div style="font-size:0.8rem; color:#8a6a3a; margin-top:0.7rem; padding:0.5rem 0.6rem; background:#1a1408; border:1px solid #302010; border-radius:3px;">⚠ Some weapons may be unwieldable depending on your starting SL.</div>
   </div>
 
   <!-- Pre-roll skull preview -->
@@ -1510,7 +1580,9 @@
     12: ["Flameforged Legend","Banisher of the Dark","Light of Lordran"],
     17: ["Godslayer Incarnate","Kindler of Dead Suns","The Undying Flame","Lordbane","Ash That Would Not Fade"],
     23: ["The One the Abyss Fears","First Flame's Final Argument","Hollowed God","Sin Incarnate","Demons Run Scared"],
-    30: ["Gwyn Weeps at the Menu Screen","Smough Files a Restraining Order","Seek Professional Help","Certified Masochist of Lordran","The Asylum Demon Turned Around and Left"]
+    30: ["Gwyn Weeps at the Menu Screen","Smough Files a Restraining Order","Certified Masochist of Lordran","The Asylum Demon Turned Around and Left"],
+    38: ["Seek Professional Help","Please Go Touch Grass","The Game Filed a Complaint","Walking Terms of Service Violation","Miyazaki's Sleep Paralysis Demon","The Final Shape of Regret","This Voided Your Warranty"],
+    47: ["You Maxxed Out The Skull Counter"]
   };
 
   // ── Taunts ──
@@ -1553,10 +1625,17 @@
         "The Anor Londo firekeeper wept so hard at the thought of you taking on this challenge that she extinguished the first flame.",
         "Seathe abandoned his research to watch your suffering instead.",
         "Nito is just glad he isn't a required boss for this run.",
-        "The Four Kings are considering relocating to the Chasm of the Abyss to avoid you.",
         "If you stare into the Abyss long enough, you can hear Kalameet asking if you're sure you want to go through with this.",
         "The Bed of Chaos is rooting for you. Are you sure you're okay?",
         "Artorias took one look at these settings and said 'nah fam, I'm good.'"],
+    38: ["This isn't a challenge run. This is a cry for help.",
+        "The game considered crashing itself out of mercy.",
+        "Miyazaki personally called to ask who hurt you.",
+        "Every NPC in Lordran held a vote. They want you to stop.",
+        "The Chosen Undead prophecy didn't account for whatever this is.",
+        "FromSoftware issued a patch specifically to ask if you're okay.",
+        "Somewhere, a speedrunner just looked at your settings and felt inadequate and terrified simultaneously."],
+    47: ["Congratulations, I guess? Surely you aren't actually doing this run with these settings, right? Right??"]
   };
 
   // ── Modifier definitions ──
@@ -1564,9 +1643,8 @@
     { id: 'mod-four-kings',  skulls: 2, label: 'Must Kill Four Kings' },
     { id: 'mod-calamity',    skulls: 6, label: 'Calamity Ring' },
     { id: 'mod-dusk-crown',  skulls: 3, label: 'Dusk Crown Ring' },
-    { id: 'mod-no-healing',  skulls: 4, label: 'No Healing' },
-    { id: 'mod-no-leveling', skulls: 5, label: 'No Leveling' },
-    { id: 'mod-no-grinding', skulls: 1, label: 'No Grinding' },
+    { id: 'mod-no-healing',       skulls: 4, label: 'No Healing' },
+    { id: 'mod-limited-bonfires',  skulls: 3, label: 'Limited Bonfires' },
   ];
 
   const HARDCORE_MODES = {
@@ -1575,6 +1653,19 @@
     hardcore: { skulls: 5, label: 'Hardcore' },
     insanity: { skulls: 10, label: 'Insanity' },
   };
+
+  const STARTING_LEVEL_MODES = {
+    'sl45-level':    { skulls: 0,  label: 'SL45 + Leveling' },
+    'class-level':   { skulls: 2,  label: 'Class Level + Leveling' },
+    'sl90-nolevel':  { skulls: 1,  label: 'SL90, No Leveling' },
+    'sl75-nolevel':  { skulls: 2,  label: 'SL75, No Leveling' },
+    'sl60-nolevel':  { skulls: 3,  label: 'SL60, No Leveling' },
+    'sl45-nolevel':  { skulls: 5,  label: 'SL45, No Leveling' },
+    'sl30-nolevel':  { skulls: 7,  label: 'SL30, No Leveling' },
+    'class-nolevel': { skulls: 10, label: 'Class Level, No Leveling' },
+  };
+
+  const STARTING_LEVEL_KEYS = Object.keys(STARTING_LEVEL_MODES);
 
   // ── State ──
   const SKULL_TIERS = Object.keys(SKULL_RANKS).map(Number).sort((a, b) => a - b);
@@ -1593,7 +1684,23 @@
   let currentPool = [];
   let characterName = '';
   let oathTaken = false;
+  let tauntCorruptInterval = null;
   const rerollsLeft = { weapon: 2, secondary: 2, shield: 2, armor: 2 };
+
+  const GLITCH_CHARS = '\u2588\u2593\u2592\u2591\u0336\u030f\u0311\u0489\u0315\u0358'.split('');
+
+  function startTauntCorruption(el, originalText) {
+    if (tauntCorruptInterval) clearInterval(tauntCorruptInterval);
+    tauntCorruptInterval = setInterval(() => {
+      const chars = originalText.split('');
+      const corruptCount = Math.max(1, Math.floor(chars.length * 0.15));
+      for (let i = 0; i < corruptCount; i++) {
+        const idx = Math.floor(Math.random() * chars.length);
+        if (chars[idx] !== ' ') chars[idx] = pick(GLITCH_CHARS);
+      }
+      el.textContent = chars.join('');
+    }, 800);
+  }
 
   function pick(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
@@ -1699,14 +1806,10 @@
 
     const notesEl = document.getElementById('res-notes');
     notesEl.innerHTML = '';
-    notesEl.innerHTML += `<div class="note-box">You may give yourself the <strong>minimum stats to one-hand</strong> this weapon.</div>`;
     if (cat === 'bow') {
       notesEl.innerHTML += `<div class="note-box">You may give yourself <strong>999 Arrows</strong>.</div>`;
     } else if (cat === 'crossbow') {
       notesEl.innerHTML += `<div class="note-box">You may give yourself <strong>999 Bolts</strong>.</div>`;
-    }
-    if (cat === 'flame' || cat === 'catalyst' || cat === 'talisman') {
-      notesEl.innerHTML += `<div class="note-box">Grants <strong>40</strong> in your primary casting stat and enough <strong>Attunement for 3 spell slots</strong>.</div>`;
     }
   }
 
@@ -1714,8 +1817,8 @@
     document.getElementById('res-secondary').textContent = weapon;
     const isCasting = WEAPONS.flame.includes(weapon) || WEAPONS.catalyst.includes(weapon) || WEAPONS.talisman.includes(weapon);
     const note = isCasting
-      ? 'Backup casting tool. You may give yourself the <strong>minimum stats to two-hand</strong> this weapon. Grants <strong>25</strong> in its casting stat and enough <strong>Attunement for 1 spell slot</strong>.'
-      : 'Backup weapon. Starts <strong>fully upgraded</strong> — any upgrade path. You may give yourself the <strong>minimum stats to two-hand</strong> this weapon.';
+      ? 'Backup casting tool.'
+      : 'Backup weapon. Starts <strong>fully upgraded</strong> — any upgrade path.';
     document.getElementById('res-secondary-notes').innerHTML =
       `<div class="note-box">${note} You are not required to use both, but this provides some flexibility.</div>`;
   }
@@ -1737,8 +1840,7 @@
       const newShield = SHIELDS.length > 1 ? pickExcluding(SHIELDS, currentShield) : pick(SHIELDS);
       currentShield = newShield;
       document.getElementById('res-shield').textContent = newShield;
-      shieldNotesEl.innerHTML = '<div class="note-box">You may only use this shield. You may not equip any other shield found in your run.</div>'
-        + '<div class="note-box">You may give yourself the <strong>minimum stats to wield</strong> this shield.</div>';
+      shieldNotesEl.innerHTML = '<div class="note-box">You may only use this shield. You may not equip any other shield found in your run.</div>';
       document.getElementById('reroll-shield').style.display = '';
       shieldRow.style.display = 'block';
       shieldDivider.style.display = 'block';
@@ -1764,8 +1866,7 @@
 
     const sharedArmorNote = `<div class="note-box">
       You may not equip any other armor found in your run.<br>
-      The <strong>helm</strong> may be unequipped, or swapped for special items once obtained in your run (Dusk Crown, Masks, etc).<br>
-      You may grant yourself the minimum <strong>Endurance</strong> to stay under 100% equip load.
+      The <strong>helm</strong> may be unequipped, or swapped for special items once obtained in your run (Dusk Crown, Masks, etc).
     </div>`;
 
     if (armorMode === 'random') {
@@ -1821,6 +1922,14 @@
     return HARDCORE_MODES[getHardcoreMode()].skulls;
   }
 
+  function getStartingLevelMode() {
+    return document.querySelector('input[name="starting-level"]:checked').value;
+  }
+
+  function getStartingLevelSkulls() {
+    return STARTING_LEVEL_MODES[getStartingLevelMode()].skulls;
+  }
+
   function calculateSkulls() {
     const base = WEAPON_DIFFICULTY[currentWeapon] || 3;
     const modSkulls = getActiveModifiers().reduce((sum, m) => sum + m.skulls, 0);
@@ -1829,7 +1938,7 @@
     const armorMode = document.querySelector('input[name="armor"]:checked').value;
     const armorSkulls = armorMode === 'random' ? 1 : armorMode === 'none' ? -2 : 0;
     const backupSkulls = document.getElementById('opt-backup').checked ? 0 : 1;
-    return Math.max(1, base + modSkulls + getHardcoreSkulls() + shieldSkulls + armorSkulls + backupSkulls);
+    return Math.max(1, base + modSkulls + getHardcoreSkulls() + getStartingLevelSkulls() + shieldSkulls + armorSkulls + backupSkulls);
   }
 
   function onModifierToggle() {
@@ -1848,14 +1957,15 @@
   function calculatePreviewSkulls() {
     const modSkulls = getActiveModifiers().reduce((sum, m) => sum + m.skulls, 0);
     const hcSkulls = getHardcoreSkulls();
+    const slSkulls = getStartingLevelSkulls();
     const shieldMode = document.querySelector('input[name="shield"]:checked').value;
     const shieldSkulls = shieldMode === 'none-physical' ? 2 : shieldMode === 'random' ? 1 : -2;
     const armorMode = document.querySelector('input[name="armor"]:checked').value;
     const armorSkulls = armorMode === 'random' ? 1 : armorMode === 'none' ? -2 : 0;
     const hasBackup = document.getElementById('opt-backup').checked;
     const backupSkulls = hasBackup ? 0 : 1;
-    const minTotal = Math.max(1, 1 + modSkulls + hcSkulls + shieldSkulls + armorSkulls + backupSkulls);
-    const maxTotal = Math.max(1, 5 + modSkulls + hcSkulls + shieldSkulls + armorSkulls + backupSkulls);
+    const minTotal = Math.max(1, 1 + modSkulls + hcSkulls + slSkulls + shieldSkulls + armorSkulls + backupSkulls);
+    const maxTotal = Math.max(1, 5 + modSkulls + hcSkulls + slSkulls + shieldSkulls + armorSkulls + backupSkulls);
     return { minTotal, maxTotal };
   }
 
@@ -1901,6 +2011,8 @@
     getActiveModifiers().forEach(m => parts.push(`${m.label}: +${m.skulls}💀`));
     const hcMode = getHardcoreMode();
     if (hcMode !== 'none') parts.push(`${HARDCORE_MODES[hcMode].label}: +${HARDCORE_MODES[hcMode].skulls}💀`);
+    const slMode = getStartingLevelMode();
+    if (slMode !== 'sl45-level') parts.push(`${STARTING_LEVEL_MODES[slMode].label}: +${STARTING_LEVEL_MODES[slMode].skulls}💀`);
     if (!document.getElementById('opt-backup').checked) parts.push('No Backup: +1💀');
     breakdownEl.textContent = parts.join(' · ');
 
@@ -1945,18 +2057,25 @@
     getActiveModifiers().forEach(m => parts.push(`${m.label}: +${m.skulls}💀`));
     const hcMode = getHardcoreMode();
     if (hcMode !== 'none') parts.push(`${HARDCORE_MODES[hcMode].label}: +${HARDCORE_MODES[hcMode].skulls}💀`);
+    const slMode = getStartingLevelMode();
+    if (slMode !== 'sl45-level') parts.push(`${STARTING_LEVEL_MODES[slMode].label}: +${STARTING_LEVEL_MODES[slMode].skulls}💀`);
     if (!document.getElementById('opt-backup').checked) parts.push('No Backup: +1💀');
     document.getElementById('skull-breakdown').textContent = parts.join(' · ');
 
     // Fire effects
     iconsEl.className = 'skull-icons';
-    document.body.classList.remove('screen-burn');
+    document.body.classList.remove('screen-burn', 'screen-glitch');
     document.querySelectorAll('.fire-bg, .blood-rain').forEach(el => el.remove());
-    if (total >= 30) {
+    if (tauntCorruptInterval) { clearInterval(tauntCorruptInterval); tauntCorruptInterval = null; }
+    if (total >= 38) {
       iconsEl.classList.add('fire-high');
-      document.body.classList.add('screen-burn');
+      document.body.classList.add('screen-burn', 'screen-glitch');
       if (!document.querySelector('.fire-bg')) { const f = document.createElement('div'); f.className = 'fire-bg'; document.body.appendChild(f); }
       if (!document.querySelector('.blood-rain')) { const b = document.createElement('div'); b.className = 'blood-rain'; document.body.appendChild(b); }
+    } else if (total >= 30) {
+      iconsEl.classList.add('fire-high');
+      document.body.classList.add('screen-burn', 'screen-glitch');
+      if (!document.querySelector('.fire-bg')) { const f = document.createElement('div'); f.className = 'fire-bg'; document.body.appendChild(f); }
     } else if (total >= 23) {
       iconsEl.classList.add('fire-high');
       document.body.classList.add('screen-burn');
@@ -1990,8 +2109,15 @@
     // Taunt
     const tauntTier = getSkullTier(total);
     const taunts = SKULL_TAUNTS[tauntTier];
-    document.getElementById('skull-taunt').textContent = pick(taunts)
+    const tauntText = pick(taunts)
       + (total < 4 ? ' — It is no true Oath unless you bear 4 or more skulls.' : '');
+    const tauntEl = document.getElementById('skull-taunt');
+    tauntEl.textContent = tauntText;
+
+    // Tier 30+: corrupt the taunt on a timer
+    if (total >= 30) {
+      startTauntCorruption(tauntEl, tauntText);
+    }
   }
 
   // ── localStorage ──
@@ -2018,7 +2144,8 @@
       hc: getHardcoreMode(),
       o: currentOathIndices,
       b: document.getElementById('opt-backup').checked ? 1 : 0,
-      n: characterName
+      n: characterName,
+      sl: getStartingLevelMode()
     };
     localStorage.setItem('ashbound-oath', JSON.stringify(data));
   }
@@ -2054,7 +2181,8 @@
       document.getElementById('opt-backup').checked ? 1 : 0,
       characterName || '',
       stats.completed, stats.honored, stats.broken, stats.maxSkulls,
-      getHardcoreMode()
+      getHardcoreMode(),
+      getStartingLevelMode()
     ];
     return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
   }
@@ -2077,6 +2205,7 @@
         const sharerStats = rest.length >= 3 ? { completed: rest[0], honored: rest[1], broken: rest[2], maxSkulls: rest[3] || 0 }
           : null;
         const hcMode = rest.length >= 5 && typeof rest[4] === 'string' ? rest[4] : 'none';
+        const slMode = rest.length >= 6 && typeof rest[5] === 'string' ? rest[5] : 'sl45-level';
         const { name: wn, cat: wc } = indexToWeapon(wi);
         return {
           p: wn, k: wc,
@@ -2090,7 +2219,8 @@
           b: bk,
           n: name,
           ss: sharerStats,
-          hc: hcMode
+          hc: hcMode,
+          sl: slMode
         };
       }
       return null;
@@ -2126,8 +2256,7 @@
       shieldDivider.style.display = 'block';
     } else if (shieldMode === 'random' && currentShield) {
       document.getElementById('res-shield').textContent = currentShield;
-      shieldNotesEl.innerHTML = '<div class="note-box">You may only use this shield. You may not equip any other shield found in your run.</div>'
-        + '<div class="note-box">You may give yourself the <strong>minimum stats to wield</strong> this shield.</div>';
+      shieldNotesEl.innerHTML = '<div class="note-box">You may only use this shield. You may not equip any other shield found in your run.</div>';
       shieldRow.style.display = 'block';
       shieldDivider.style.display = 'block';
     } else if (shieldMode === 'none-physical') {
@@ -2146,7 +2275,7 @@
     const armorDivider = document.getElementById('armor-divider');
     const armorNotesEl = document.getElementById('res-armor-notes');
     armorNotesEl.innerHTML = '';
-    const sharedArmorNote = `<div class="note-box">You may not equip any other armor found in your run.<br>The <strong>helm</strong> may be unequipped, or swapped for special items once obtained in your run (Dusk Crown, Masks, etc).<br>You may grant yourself the minimum <strong>Endurance</strong> to stay under 100% equip load.</div>`;
+    const sharedArmorNote = `<div class="note-box">You may not equip any other armor found in your run.<br>The <strong>helm</strong> may be unequipped, or swapped for special items once obtained in your run (Dusk Crown, Masks, etc).</div>`;
 
     if (armorMode === 'random' && currentArmor) {
       document.getElementById('res-armor').textContent = currentArmor;
@@ -2174,6 +2303,7 @@
     document.getElementById('panel-armor').style.display = 'none';
     document.getElementById('panel-modifiers').style.display = 'none';
     document.getElementById('panel-hardcore').style.display = 'none';
+    document.getElementById('panel-starting-level').style.display = 'none';
     document.getElementById('skull-preview').style.display = 'none';
     document.getElementById('warn-empty').style.display = 'none';
     document.getElementById('btn-generate').style.display = 'none';
@@ -2191,6 +2321,8 @@
     MODIFIERS.forEach((m, i) => { document.getElementById(m.id).checked = !!state.m[i]; });
     const hcRadio = document.querySelector(`input[name="hardcore"][value="${state.hc || 'none'}"]`);
     if (hcRadio) hcRadio.checked = true;
+    const slRadio = document.querySelector(`input[name="starting-level"][value="${state.sl || 'sl45-level'}"]`);
+    if (slRadio) slRadio.checked = true;
     document.getElementById('opt-backup').checked = !!state.b;
 
     // Restore state
@@ -2302,6 +2434,8 @@
     MODIFIERS.forEach((m, i) => { document.getElementById(m.id).checked = !!((data.mb >> i) & 1); });
     const hcRadioCached = document.querySelector(`input[name="hardcore"][value="${data.hc || 'none'}"]`);
     if (hcRadioCached) hcRadioCached.checked = true;
+    const slRadioCached = document.querySelector(`input[name="starting-level"][value="${data.sl || 'sl45-level'}"]`);
+    if (slRadioCached) slRadioCached.checked = true;
     document.getElementById('opt-backup').checked = !!data.b;
 
     // Render
@@ -2327,6 +2461,7 @@
     document.getElementById('panel-armor').style.display = 'none';
     document.getElementById('panel-modifiers').style.display = 'none';
     document.getElementById('panel-hardcore').style.display = 'none';
+    document.getElementById('panel-starting-level').style.display = 'none';
     document.getElementById('skull-preview').style.display = 'none';
     document.getElementById('warn-empty').style.display = 'none';
     document.getElementById('btn-generate').style.display = 'none';
@@ -2359,6 +2494,7 @@
     document.getElementById('btn-take-oath').style.display = 'none';
     document.getElementById('panel-modifiers').style.display = 'none';
     document.getElementById('panel-hardcore').style.display = 'none';
+    document.getElementById('panel-starting-level').style.display = 'none';
     document.getElementById('oath-actions').style.display = 'block';
     document.getElementById('char-name-row-config').style.display = 'none';
     saveCachedOath();
@@ -2409,7 +2545,7 @@
         hideModal();
         showModal(
           'Oath Honored?',
-          'Did you at least kindle a flame beyond Firelink? Did you raise your weapon against the dark, however briefly? The fire does not forget those who honored their oath.',
+          'Did you at least make it out of the Asylum and into Firelink? Did you raise your weapon against the dark, however briefly? The fire does not forget those who honored their oath.',
           'Yes — I walked the path',
           'No…',
           () => {
@@ -2426,7 +2562,7 @@
             showModal(
               'Oathbreaker',
               'Then you are a filthy, wretched, vile, contemptable, craven, maidenless oathbreaker. Do you accept this shame?',
-              'Yes... I am a maidenless oathbreaker',
+              'Yes… I am a maidenless oathbreaker',
               'No — I will try again',
               () => {
                 const stats = loadStats();
@@ -2464,6 +2600,7 @@
     document.getElementById('panel-armor').style.display = '';
     document.getElementById('panel-modifiers').style.display = '';
     document.getElementById('panel-hardcore').style.display = '';
+    document.getElementById('panel-starting-level').style.display = '';
     document.getElementById('skull-preview').style.display = '';
 
     const btn = document.getElementById('btn-generate');
@@ -2474,8 +2611,9 @@
     document.getElementById('result').style.display = 'none';
     document.getElementById('char-name-display').style.display = 'none';
     document.querySelectorAll('.reroll-btn').forEach(btn => btn.style.display = '');
-    document.body.classList.remove('screen-burn');
+    document.body.classList.remove('screen-burn', 'screen-glitch');
     document.querySelectorAll('.fire-bg, .blood-rain').forEach(el => el.remove());
+    if (tauntCorruptInterval) { clearInterval(tauntCorruptInterval); tauntCorruptInterval = null; }
     history.replaceState(null, '', window.location.pathname);
     restoreConfig();
     renderPreviewSkulls();
@@ -2492,6 +2630,7 @@
       shield: document.querySelector('input[name="shield"]:checked').value,
       armor: document.querySelector('input[name="armor"]:checked').value,
       hardcore: getHardcoreMode(),
+      startingLevel: getStartingLevelMode(),
       backupPref: document.querySelector('input[name="backup-pref"]:checked').value,
       name: characterName,
       rulesOpen: document.querySelector('details.rules').hasAttribute('open') ? 1 : 0
@@ -2512,6 +2651,7 @@
     if (cfg.shield) { const r = document.querySelector(`input[name="shield"][value="${cfg.shield}"]`); if (r) r.checked = true; }
     if (cfg.armor) { const r = document.querySelector(`input[name="armor"][value="${cfg.armor}"]`); if (r) r.checked = true; }
     if (cfg.hardcore) { const r = document.querySelector(`input[name="hardcore"][value="${cfg.hardcore}"]`); if (r) r.checked = true; }
+    if (cfg.startingLevel) { const r = document.querySelector(`input[name="starting-level"][value="${cfg.startingLevel}"]`); if (r) r.checked = true; }
     if (cfg.backupPref) { const r = document.querySelector(`input[name="backup-pref"][value="${cfg.backupPref}"]`); if (r) r.checked = true; }
     if (cfg.rulesOpen !== undefined) {
       const rules = document.querySelector('details.rules');
@@ -2529,6 +2669,7 @@
     document.querySelectorAll('input[name="shield"]').forEach(r => r.addEventListener('change', saveConfig));
     document.querySelectorAll('input[name="armor"]').forEach(r => r.addEventListener('change', saveConfig));
     document.querySelectorAll('input[name="hardcore"]').forEach(r => r.addEventListener('change', saveConfig));
+    document.querySelectorAll('input[name="starting-level"]').forEach(r => r.addEventListener('change', saveConfig));
     document.querySelectorAll('input[name="backup-pref"]').forEach(r => r.addEventListener('change', saveConfig));
     document.querySelector('details.rules').addEventListener('toggle', saveConfig);
   }
