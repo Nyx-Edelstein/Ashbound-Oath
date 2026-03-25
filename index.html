@@ -457,11 +457,11 @@
 
     /* ── Tier 30: screen glitch / corruption ── */
     .screen-glitch {
-      animation: glitchPulse 4s ease-in-out infinite;
+      animation: glitchPulse 4s steps(1) infinite;
     }
 
     @keyframes glitchPulse {
-      0%, 100% { filter: none; }
+      0%       { filter: none; }
       15%      { filter: hue-rotate(20deg) saturate(1.3); }
       30%      { filter: hue-rotate(-15deg) brightness(1.1); }
       45%      { filter: none; }
@@ -777,6 +777,7 @@
         <li>Your <strong>weapons, shield, and armor</strong> are randomly rolled. You must use only what the Oath gives you — see sections below for details.</li>
         <li><strong>Immediately remove your Estus Flask</strong>. You do not have one. All other healing (Humanity, Divine Blessings, miracles, etc.) is permitted (excepting challenge modifiers).</li>
         <li>Choose a <strong>Starting Level</strong> option. You may pick any class and allocate stats freely, as long as your Soul Level does not exceed the chosen cap. If leveling is allowed, you may level up freely during the run. If not, you must remain at the Soul Level you started with.</li>
+        <li>A <strong>primary casting implement</strong> grants <strong>3 distinct spells</strong> of its type to start. A <strong>secondary casting implement</strong> grants <strong>1 spell</strong>.</li>
         <li>Start with an empty inventory except your starting gift, class items (picked up at the Asylum), and rolled equipment. Note: Unless one of your Oath weapons is a Pyromancy Flame, you may not upgrade a Pyromancy Flame obtained by starting with the Pyromancer class.</li>
       </ul>
       <h3>Goal</h3>
@@ -1446,7 +1447,7 @@
     "Sniper Crossbow":         ["hunter"],
     "Avelyn":                  ["sorcery", "hunter"],
     // ── Casting tools ──
-    "Pyromancy Flame +15":     ["chaos"]
+    "Ascended Pyromancy Flame +5":     ["chaos"]
   };
   // All catalysts → sorcery, all talismans → holy
   WEAPONS.catalyst.forEach(w => { WEAPON_ARMOR_MAP[w] = ["sorcery"]; });
@@ -1525,7 +1526,7 @@
     "Blacksmith Hammer":3,"Pickaxe":3,"Grant":3,"Smough's Hammer":3,"Dragon Tooth":3,
     "Greatsword of Artorias":3,"Cursed Greatsword of Artorias":3,"Velka's Rapier":3,
     "Composite Bow":3,"Longbow":3,"Black Bow of Pharis":3,"Heavy Crossbow":3,"Sniper Crossbow":3,
-    "Short Bow":3,"Pyromancy Flame +15":3,"Butcher Knife":3,
+    "Short Bow":3,"Ascended Pyromancy Flame +5":3,"Butcher Knife":3,
     // 4 skulls — hard
     "Dagger":4,"Bandit's Knife":4,"Cestus":4,"Claw":4,"Whip":4,"Notched Whip":4,
     "Four-Pronged Plow":4,"Guardian Tail":4,"Lifehunt Scythe & Bloodshield":4,
@@ -1811,13 +1812,16 @@
     } else if (cat === 'crossbow') {
       notesEl.innerHTML += `<div class="note-box">You may give yourself <strong>999 Bolts</strong>.</div>`;
     }
+    if (cat === 'flame' || cat === 'catalyst' || cat === 'talisman') {
+      notesEl.innerHTML += `<div class="note-box">Grants <strong>3 distinct spells</strong> of this implement's type to start.</div>`;
+    }
   }
 
   function renderSecondary(weapon) {
     document.getElementById('res-secondary').textContent = weapon;
     const isCasting = WEAPONS.flame.includes(weapon) || WEAPONS.catalyst.includes(weapon) || WEAPONS.talisman.includes(weapon);
     const note = isCasting
-      ? 'Backup casting tool.'
+      ? 'Backup casting tool. Grants <strong>1 spell</strong> of its type to start.'
       : 'Backup weapon. Starts <strong>fully upgraded</strong> — any upgrade path.';
     document.getElementById('res-secondary-notes').innerHTML =
       `<div class="note-box">${note} You are not required to use both, but this provides some flexibility.</div>`;
