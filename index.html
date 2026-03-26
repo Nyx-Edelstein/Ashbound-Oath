@@ -942,7 +942,7 @@
     </div>
   </div>
 
-  <div id="warn-empty">Select at least one weapon category to roll.</div>
+  <div id="warn-empty">Select at least one weapon category to roll. The Pyromancy Flame cannot be the only selection — include at least one other category.</div>
 
   <!-- Challenge Modifiers -->
   <div class="panel" id="panel-modifiers">
@@ -2813,14 +2813,24 @@
     if (document.getElementById('pool-crossbow').checked) WEAPONS.crossbow.forEach(w  => pool.push({ w, cat: 'crossbow' }));
 
     if (pool.length === 0) {
+      warn.textContent = 'Select at least one weapon category to roll.';
+      warn.style.display = 'block';
+      document.getElementById('result').style.display = 'none';
+      return;
+    }
+
+    // Pyromancy Flame cannot be the sole primary weapon option
+    const nonFlamePool = pool.filter(entry => entry.cat !== 'flame');
+    if (nonFlamePool.length === 0) {
+      warn.textContent = 'The Pyromancy Flame cannot be the only selection — include at least one other category.';
       warn.style.display = 'block';
       document.getElementById('result').style.display = 'none';
       return;
     }
     warn.style.display = 'none';
 
-    // Store pool and roll
-    currentPool = pool;
+    // Store pool and roll (flame excluded from primary draw)
+    currentPool = nonFlamePool;
     const { w: weapon, cat } = pick(pool);
     currentWeapon = weapon;
     currentWeaponCat = cat;
