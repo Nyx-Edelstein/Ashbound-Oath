@@ -886,6 +886,21 @@
           <span class="sublabel">A shield is randomly selected — you may only use this one.</span>
         </span>
       </label>
+      <div id="shield-pool-group" style="margin-left:1.5rem; margin-top:0.1rem; margin-bottom:0.3rem; display:none">
+        <div style="font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; color:#8a7860; margin-bottom:0.25rem">Shield Pool</div>
+        <label class="check-label">
+          <input type="checkbox" id="shpool-small" checked onchange="onShieldPoolChange(this)">
+          Small Shields
+        </label>
+        <label class="check-label">
+          <input type="checkbox" id="shpool-normal" checked onchange="onShieldPoolChange(this)">
+          Normal Shields
+        </label>
+        <label class="check-label">
+          <input type="checkbox" id="shpool-great" checked onchange="onShieldPoolChange(this)">
+          Greatshields
+        </label>
+      </div>
       <label class="radio-label">
         <input type="radio" name="shield" value="none-physical" onchange="renderPreviewSkulls(); onShieldModeChange()">
         <span>No Shield (Two-Hand or Dual Wield) <span class="modifier-skulls">+2 💀</span>
@@ -897,21 +912,6 @@
         <span>No Restrictions <span class="modifier-skulls">−2 💀</span>
           <span class="sublabel">Equip any shield freely.</span>
         </span>
-      </label>
-    </div>
-    <div id="shield-pool-group" style="margin-left:1.5rem; margin-top:0.5rem; display:none">
-      <div style="font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; color:#8a7860; margin-bottom:0.25rem">Shield Pool</div>
-      <label class="check-label">
-        <input type="checkbox" id="shpool-small" checked onchange="onShieldPoolChange(this)">
-        Small Shields
-      </label>
-      <label class="check-label">
-        <input type="checkbox" id="shpool-normal" checked onchange="onShieldPoolChange(this)">
-        Normal Shields
-      </label>
-      <label class="check-label">
-        <input type="checkbox" id="shpool-great" checked onchange="onShieldPoolChange(this)">
-        Greatshields
       </label>
     </div>
   </div>
@@ -2743,6 +2743,7 @@
       });
     }
     onShieldModeChange();
+    document.getElementById('backup-pref-group').style.display = document.getElementById('opt-backup').checked ? '' : 'none';
   }
 
   // Attach auto-save to all config controls
