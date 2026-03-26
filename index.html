@@ -778,7 +778,7 @@
         <li><strong>Immediately remove your Estus Flask</strong>. You do not have one. All other healing (Humanity, Divine Blessings, miracles, etc.) is permitted (excepting challenge modifiers).</li>
         <li>Choose a <strong>Starting Level</strong> option. You may pick any class and allocate stats freely, as long as your Soul Level does not exceed the chosen cap. If leveling is allowed, you may level up freely during the run. If not, you must remain at the Soul Level you started with.</li>
         <li>A <strong>primary casting implement</strong> grants <strong>3 distinct spells</strong> of its type to start. A <strong>secondary casting implement</strong> grants <strong>1 spell</strong>.</li>
-        <li>Start with an empty inventory except your starting gift, class items (picked up at the Asylum), and rolled equipment. Note: Unless one of your Oath weapons is a Pyromancy Flame, you may not upgrade a Pyromancy Flame obtained by starting with the Pyromancer class.</li>
+        <li>Start with an empty inventory except your starting gift, class items (picked up at the Asylum), and rolled equipment.</li>
       </ul>
       <h3>Goal</h3>
       <ul>
@@ -881,22 +881,37 @@
     <div class="panel-title">Shield</div>
     <div class="radio-group">
       <label class="radio-label">
-        <input type="radio" name="shield" value="random" onchange="renderPreviewSkulls()">
+        <input type="radio" name="shield" value="random" onchange="renderPreviewSkulls(); onShieldModeChange()">
         <span>Random Shield <span class="modifier-skulls">+1 💀</span>
           <span class="sublabel">A shield is randomly selected — you may only use this one.</span>
         </span>
       </label>
       <label class="radio-label">
-        <input type="radio" name="shield" value="none-physical" onchange="renderPreviewSkulls()">
+        <input type="radio" name="shield" value="none-physical" onchange="renderPreviewSkulls(); onShieldModeChange()">
         <span>No Shield (Two-Hand or Dual Wield) <span class="modifier-skulls">+2 💀</span>
           <span class="sublabel">No shield. Two-hand your weapon or dual wield any off-hand weapon you scavenge during your run.</span>
         </span>
       </label>
       <label class="radio-label">
-        <input type="radio" name="shield" value="free" checked onchange="renderPreviewSkulls()">
+        <input type="radio" name="shield" value="free" checked onchange="renderPreviewSkulls(); onShieldModeChange()">
         <span>No Restrictions <span class="modifier-skulls">−2 💀</span>
           <span class="sublabel">Equip any shield freely.</span>
         </span>
+      </label>
+    </div>
+    <div id="shield-pool-group" style="margin-left:1.5rem; margin-top:0.5rem; display:none">
+      <div style="font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; color:#8a7860; margin-bottom:0.25rem">Shield Pool</div>
+      <label class="check-label">
+        <input type="checkbox" id="shpool-small" checked onchange="onShieldPoolChange(this)">
+        Small Shields
+      </label>
+      <label class="check-label">
+        <input type="checkbox" id="shpool-normal" checked onchange="onShieldPoolChange(this)">
+        Normal Shields
+      </label>
+      <label class="check-label">
+        <input type="checkbox" id="shpool-great" checked onchange="onShieldPoolChange(this)">
+        Greatshields
       </label>
     </div>
   </div>
@@ -914,13 +929,13 @@
       <label class="radio-label">
         <input type="radio" name="armor" value="choice" onchange="renderPreviewSkulls()">
         <span>Choose Your Own
-          <span class="sublabel">Pick any set; same restrictions apply.</span>
+          <span class="sublabel">Pick any armor; same restrictions apply. You cannot change it once selected.</span>
         </span>
       </label>
       <label class="radio-label">
         <input type="radio" name="armor" value="none" checked onchange="renderPreviewSkulls()">
         <span>None <span class="modifier-skulls">−2 💀</span>
-          <span class="sublabel">No armor restriction — equip freely.</span>
+          <span class="sublabel">No armor restriction — equip freely from armor you scavenge.</span>
         </span>
       </label>
     </div>
@@ -1282,19 +1297,24 @@
     ]
   };
 
-  const SHIELDS = [
+  const SHIELDS_SMALL = [
     "Small Leather Shield", "Leather Shield", "Target Shield", "Buckler",
     "Cracked Round Shield", "Warrior's Round Shield", "Red & White Round Shield",
-    "Caduceus Round Shield", "Effigy Shield", "Plank Shield", "Crystal Ring Shield",
+    "Caduceus Round Shield", "Effigy Shield", "Plank Shield", "Crystal Ring Shield"
+  ];
+  const SHIELDS_NORMAL = [
     "Gargoyle's Shield", "East-West Shield", "Wooden Shield", "Large Leather Shield",
     "Heater Shield", "Knight Shield", "Tower Kite Shield", "Caduceus Kite Shield",
     "Hollow Soldier Shield", "Balder Shield", "Sunlight Shield", "Iron Round Shield",
     "Silver Knight Shield", "Black Knight Shield", "Pierce Shield", "Spiked Shield",
     "Crest Shield", "Dragon Crest Shield", "Grass Crest Shield", "Spider Shield",
-    "Bloodshield", "Sanctus", "Crystal Shield", "Bonewheel Shield",
+    "Bloodshield", "Sanctus", "Crystal Shield", "Bonewheel Shield"
+  ];
+  const SHIELDS_GREAT = [
     "Tower Shield", "Stone Greatshield", "Eagle Shield", "Black Iron Greatshield",
     "Havel's Greatshield", "Greatshield of Artorias", "Giant Shield", "Cleansing Greatshield"
   ];
+  const SHIELDS = [...SHIELDS_SMALL, ...SHIELDS_NORMAL, ...SHIELDS_GREAT];
 
   const ARMOR_SETS = [
     "Adventurer's Set", "Antiquated Set", "Artorias' Set", "Balder Set",
@@ -1798,6 +1818,26 @@
     updateRerollButton('reroll-' + category, category);
   }
 
+  function getShieldPool() {
+    const pool = [];
+    if (document.getElementById('shpool-small').checked) pool.push(...SHIELDS_SMALL);
+    if (document.getElementById('shpool-normal').checked) pool.push(...SHIELDS_NORMAL);
+    if (document.getElementById('shpool-great').checked) pool.push(...SHIELDS_GREAT);
+    return pool.length > 0 ? pool : SHIELDS;
+  }
+
+  function onShieldModeChange() {
+    const isRandom = document.querySelector('input[name="shield"]:checked').value === 'random';
+    document.getElementById('shield-pool-group').style.display = isRandom ? '' : 'none';
+  }
+
+  function onShieldPoolChange(el) {
+    const anyChecked = ['shpool-small','shpool-normal','shpool-great'].some(id => document.getElementById(id).checked);
+    if (!anyChecked) { el.checked = true; return; }
+    renderPreviewSkulls();
+    saveConfig();
+  }
+
   function renderWeapon(weapon, cat) {
     document.getElementById('res-weapon').textContent = weapon;
     document.getElementById('res-category').innerHTML =
@@ -1845,7 +1885,8 @@
       shieldRow.style.display = 'block';
       shieldDivider.style.display = 'block';
     } else if (shieldMode === 'random') {
-      const newShield = SHIELDS.length > 1 ? pickExcluding(SHIELDS, currentShield) : pick(SHIELDS);
+      const shieldPool = getShieldPool();
+      const newShield = shieldPool.length > 1 ? pickExcluding(shieldPool, currentShield) : pick(shieldPool);
       currentShield = newShield;
       document.getElementById('res-shield').textContent = newShield;
       shieldNotesEl.innerHTML = '<div class="note-box">You may only use this shield. You may not equip any other shield found in your run.</div>';
@@ -1938,7 +1979,7 @@
     }
 
     if (activeMods.has('mod-limited-bonfires') && hcMode === 'frail') {
-      bonuses.push({ label: 'Tethered Hollow', bonus: 4 });
+      bonuses.push({ label: 'Ashen Pilgrim', bonus: 4 });
     }
 
     return bonuses;
@@ -2667,7 +2708,8 @@
       startingLevel: getStartingLevelMode(),
       backupPref: document.querySelector('input[name="backup-pref"]:checked').value,
       name: characterName,
-      rulesOpen: document.querySelector('details.rules').hasAttribute('open') ? 1 : 0
+      rulesOpen: document.querySelector('details.rules').hasAttribute('open') ? 1 : 0,
+      shieldPool: ['shpool-small','shpool-normal','shpool-great'].map(id => document.getElementById(id).checked ? 1 : 0)
     };
     localStorage.setItem('ashbound-config', JSON.stringify(cfg));
   }
@@ -2695,6 +2737,12 @@
       characterName = cfg.name;
       document.getElementById('char-name-config').value = cfg.name;
     }
+    if (cfg.shieldPool) {
+      ['shpool-small','shpool-normal','shpool-great'].forEach((id, i) => {
+        document.getElementById(id).checked = !!cfg.shieldPool[i];
+      });
+    }
+    onShieldModeChange();
   }
 
   // Attach auto-save to all config controls
