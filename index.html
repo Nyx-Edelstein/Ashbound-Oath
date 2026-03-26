@@ -413,17 +413,18 @@
       width: 120px;
       pointer-events: none;
       z-index: 9999;
-      animation: burnPulse 3s ease-in-out infinite alternate;
     }
 
     .screen-burn::before {
       left: 0;
       background: linear-gradient(to right, #a0300060 0%, #c8480030 40%, transparent 100%);
+      animation: burnPulse var(--burn-before-dur, 3s) ease-in-out infinite alternate;
     }
 
     .screen-burn::after {
       right: 0;
       background: linear-gradient(to left, #a0300060 0%, #c8480030 40%, transparent 100%);
+      animation: burnPulse var(--burn-after-dur, 3.7s) ease-in-out infinite alternate;
     }
 
     @keyframes burnPulse {
@@ -457,7 +458,7 @@
 
     /* ── Tier 30: screen glitch / corruption ── */
     .screen-glitch {
-      animation: glitchPulse 4s steps(1) infinite;
+      animation: glitchPulse var(--glitch-dur, 4s) steps(1) infinite;
     }
 
     @keyframes glitchPulse {
@@ -1709,21 +1710,35 @@
   let characterName = '';
   let oathTaken = false;
   let tauntCorruptInterval = null;
+  let glitchRandomizerTimeout = null;
   const rerollsLeft = { weapon: 2, secondary: 2, shield: 2, armor: 2 };
 
   const GLITCH_CHARS = '\u2588\u2593\u2592\u2591\u0336\u030f\u0311\u0489\u0315\u0358'.split('');
 
+  function startGlitchRandomizer() {
+    if (glitchRandomizerTimeout) clearTimeout(glitchRandomizerTimeout);
+    const step = () => {
+      document.body.style.setProperty('--glitch-dur', (1.5 + Math.random() * 5).toFixed(2) + 's');
+      glitchRandomizerTimeout = setTimeout(step, 800 + Math.floor(Math.random() * 4200));
+    };
+    step();
+  }
+
   function startTauntCorruption(el, originalText) {
-    if (tauntCorruptInterval) clearInterval(tauntCorruptInterval);
-    tauntCorruptInterval = setInterval(() => {
-      const chars = originalText.split('');
-      const corruptCount = Math.max(1, Math.floor(chars.length * 0.15));
-      for (let i = 0; i < corruptCount; i++) {
-        const idx = Math.floor(Math.random() * chars.length);
-        if (chars[idx] !== ' ') chars[idx] = pick(GLITCH_CHARS);
-      }
-      el.textContent = chars.join('');
-    }, 800);
+    if (tauntCorruptInterval) clearTimeout(tauntCorruptInterval);
+    const scheduleNext = () => {
+      tauntCorruptInterval = setTimeout(() => {
+        const chars = originalText.split('');
+        const corruptCount = Math.max(1, Math.floor(chars.length * 0.15));
+        for (let i = 0; i < corruptCount; i++) {
+          const idx = Math.floor(Math.random() * chars.length);
+          if (chars[idx] !== ' ') chars[idx] = pick(GLITCH_CHARS);
+        }
+        el.textContent = chars.join('');
+        scheduleNext();
+      }, 300 + Math.floor(Math.random() * 1300));
+    };
+    scheduleNext();
   }
 
   function pick(arr) {
@@ -2139,24 +2154,38 @@
     // Fire effects
     iconsEl.className = 'skull-icons';
     document.body.classList.remove('screen-burn', 'screen-glitch');
+    document.body.style.removeProperty('--burn-before-dur');
+    document.body.style.removeProperty('--burn-after-dur');
+    document.body.style.removeProperty('--glitch-dur');
     document.querySelectorAll('.fire-bg, .blood-rain').forEach(el => el.remove());
-    if (tauntCorruptInterval) { clearInterval(tauntCorruptInterval); tauntCorruptInterval = null; }
+    if (tauntCorruptInterval) { clearTimeout(tauntCorruptInterval); tauntCorruptInterval = null; }
+    if (glitchRandomizerTimeout) { clearTimeout(glitchRandomizerTimeout); glitchRandomizerTimeout = null; }
     if (total >= 38) {
       iconsEl.classList.add('fire-high');
       document.body.classList.add('screen-burn', 'screen-glitch');
+      document.body.style.setProperty('--burn-before-dur', (1.8 + Math.random() * 3.5).toFixed(2) + 's');
+      document.body.style.setProperty('--burn-after-dur', (1.8 + Math.random() * 3.5).toFixed(2) + 's');
+      startGlitchRandomizer();
       if (!document.querySelector('.fire-bg')) { const f = document.createElement('div'); f.className = 'fire-bg'; document.body.appendChild(f); }
       if (!document.querySelector('.blood-rain')) { const b = document.createElement('div'); b.className = 'blood-rain'; document.body.appendChild(b); }
     } else if (total >= 30) {
       iconsEl.classList.add('fire-high');
       document.body.classList.add('screen-burn', 'screen-glitch');
+      document.body.style.setProperty('--burn-before-dur', (1.8 + Math.random() * 3.5).toFixed(2) + 's');
+      document.body.style.setProperty('--burn-after-dur', (1.8 + Math.random() * 3.5).toFixed(2) + 's');
+      startGlitchRandomizer();
       if (!document.querySelector('.fire-bg')) { const f = document.createElement('div'); f.className = 'fire-bg'; document.body.appendChild(f); }
     } else if (total >= 23) {
       iconsEl.classList.add('fire-high');
       document.body.classList.add('screen-burn');
+      document.body.style.setProperty('--burn-before-dur', (1.8 + Math.random() * 3.5).toFixed(2) + 's');
+      document.body.style.setProperty('--burn-after-dur', (1.8 + Math.random() * 3.5).toFixed(2) + 's');
       if (!document.querySelector('.fire-bg')) { const f = document.createElement('div'); f.className = 'fire-bg'; document.body.appendChild(f); }
     } else if (total >= 17) {
       iconsEl.classList.add('fire-high');
       document.body.classList.add('screen-burn');
+      document.body.style.setProperty('--burn-before-dur', (1.8 + Math.random() * 3.5).toFixed(2) + 's');
+      document.body.style.setProperty('--burn-after-dur', (1.8 + Math.random() * 3.5).toFixed(2) + 's');
       if (!document.querySelector('.fire-bg')) { const f = document.createElement('div'); f.className = 'fire-bg'; document.body.appendChild(f); }
     } else if (total >= 12) {
       iconsEl.classList.add('fire-high');
@@ -2174,7 +2203,7 @@
     const titleEl = document.getElementById('skull-title');
     if (total >= 23) {
       titleEl.innerHTML = titleText.split('').map((ch, i) =>
-        ch === ' ' ? ' ' : `<span class="wiggle-letter" style="animation-delay:${(i * 0.04).toFixed(2)}s">${ch}</span>`
+        ch === ' ' ? ' ' : `<span class="wiggle-letter" style="animation-duration:${(0.09 + Math.random() * 0.13).toFixed(2)}s;animation-delay:${(Math.random() * 0.4).toFixed(2)}s">${ch}</span>`
       ).join('');
     } else {
       titleEl.textContent = titleText;
@@ -2686,8 +2715,12 @@
     document.getElementById('char-name-display').style.display = 'none';
     document.querySelectorAll('.reroll-btn').forEach(btn => btn.style.display = '');
     document.body.classList.remove('screen-burn', 'screen-glitch');
+    document.body.style.removeProperty('--burn-before-dur');
+    document.body.style.removeProperty('--burn-after-dur');
+    document.body.style.removeProperty('--glitch-dur');
     document.querySelectorAll('.fire-bg, .blood-rain').forEach(el => el.remove());
-    if (tauntCorruptInterval) { clearInterval(tauntCorruptInterval); tauntCorruptInterval = null; }
+    if (tauntCorruptInterval) { clearTimeout(tauntCorruptInterval); tauntCorruptInterval = null; }
+    if (glitchRandomizerTimeout) { clearTimeout(glitchRandomizerTimeout); glitchRandomizerTimeout = null; }
     history.replaceState(null, '', window.location.pathname);
     restoreConfig();
     renderPreviewSkulls();
